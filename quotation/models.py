@@ -64,7 +64,7 @@ class Item(ModelBase):
         return "{}_{}_{}".format(self.sn, self.cate.name, self.name)
 
 
-class Inquiry(models.Model):
+class Inquiry(ModelBase):
 
     class Status(models.TextChoices):
         ONGOING = '詢價中'
@@ -93,7 +93,47 @@ class Inquiry(models.Model):
         choices=Status.choices,
         default=Status.ONGOING,
     )
+    remark = models.CharField(
+        max_length=300,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return "{}_{}_{}".format(self.sn, self.cate.name, self.company.shortname)
 
+
+class Current(models.Model):
+    code = models.CharField(max_length=4)
+    name = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
+
+
+class ItemQuota(ModelBase):
+    itemsn = models.ForeignKey(
+        Item,
+        on_delete=models.PROTECT,
+        related_name='itemquota',
+    )
+    inquirysn = models.ForeignKey(
+        Inquiry,
+        on_delete=models.PROTECT,
+        related_name='itemquota',
+    )
+    count = models.IntegerField(default=1)
+    price = models.DecimalField(max_digits=14, decimal_places=4)
+    crnt = models.ForeignKey(
+        Current,
+        on_delete=models.PROTECT,
+        related_name='itemquota',
+    )
+    xchgrt = models.DecimalField(max_digits=6, decimal_places=6)
+    is_new = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "{}_{}".format(self.inquirysn.sn, self.itemsn.name)
+
+    def ntd_price(self):
+        return self.price * self.xchgrt
