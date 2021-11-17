@@ -62,3 +62,38 @@ class Item(ModelBase):
 
     def __str__(self):
         return "{}_{}_{}".format(self.sn, self.cate.name, self.name)
+
+
+class Inquiry(models.Model):
+
+    class Status(models.TextChoices):
+        ONGOING = '詢價中'
+        END = '結案'
+
+    sn = models.CharField(max_length=12)
+    startdate = models.DateField()
+    enddate = models.DateField()
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name='inquirys',
+    )
+    cate = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        related_name='inquirys',
+    )
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.PROTECT,
+        related_name='inquirys',
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.ONGOING,
+    )
+
+    def __str__(self):
+        return "{}_{}_{}".format(self.sn, self.cate.name, self.company.shortname)
+
