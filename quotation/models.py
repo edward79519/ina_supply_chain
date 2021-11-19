@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 class ModelBase(models.Model):
     addtime = models.DateTimeField(auto_now_add=True)
     updatetime = models.DateTimeField(auto_now=True)
-    is_valid = models.BooleanField(default=True)
+    is_open = models.BooleanField(default=True)
 
     class Meta:
         abstract = True

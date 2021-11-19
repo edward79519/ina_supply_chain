@@ -1,0 +1,63 @@
+{% extends 'frame/base.html' %}
+
+{% block title %}{{ comp.fullname }} - 詳細資料{% endblock %}
+{% block css %}
+  <link href="/static/custom/page.css" rel="stylesheet">
+{% endblock %}
+{% block scripts %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <script>
+      var options = {
+        valueNames: [ 'pubdate', 'company', 'dept', 'fullsn', 'name', 'abstract', 'addtime' ],
+        page: 10,
+        pagination: [{
+            name: "pagination",
+            paginationClass: "pagination",
+            innerWindow: 1,
+            outerWindow: 1,
+        }],
+      };
+
+      /*table = id of the div */
+      var userList = new List('table', options);
+    </script>
+{% endblock %}
+{% block content %}
+  <section id="basic" class="py-3">
+    <div class="container py-3">
+      <h1 class="my-3">{{ comp.fullname }} - 詳細資料</h1>
+      <a role="button" class="btn btn-primary" href="{% url 'Comp_Index' %}">回廠商列表</a>
+      <a role="button" class="btn btn-danger" href="{% url 'Comp_Update' comp.id %}">編輯</a>
+      <div class="row">
+        <div class="col-md-6 my-3">
+          <h6>公司名稱：</h6>
+          <h5 class="font-weight-bold">{{ comp.fullname }}</h5>
+        </div>
+        <div class="col-md-3 my-3">
+          <h6>簡稱：</h6>
+          <h5 class="font-weight-bold">{{ comp.shortname }}</h5>
+        </div>
+        <div class="col-md-3 my-3">
+          <h6>統一編號：</h6>
+          <h5 class="font-weight-bold">{{ comp.sn }}</h5>
+        </div>
+        <div class="col-lg-3 col-md-6 my-3">
+          <h6>聯絡人：</h6>
+          <h5 class="font-weight-bold">{{ comp.spnsr }}({{ comp.spnsr_shrtname }})</h5>
+        </div>
+        <div class="col-lg-3 col-md-6 my-3">
+          <h6>連絡電話：</h6>
+          <h5 class="font-weight-bold">{{ comp.tel }} ext:{% if comp.tel_ext %}{{ comp.tel_ext }}{% endif %}</h5>
+        </div>
+        <div class="col-lg-3 col-md-6 my-3">
+          <h6>E-mail：</h6>
+          <h5 class="font-weight-bold">{{ comp.email }}</h5>
+        </div>
+        <div class="col-12 my-3">
+          <h6>備註：</h6>
+          <h5 class="font-weight-bold">{{ comp.remark }}</h5>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

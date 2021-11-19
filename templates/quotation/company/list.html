@@ -1,0 +1,79 @@
+{% extends 'frame/base.html' %}
+
+{% block title %}廠商列表 - 寶晶供應鏈管理系統{% endblock %}
+{% block css %}
+  <link href="/static/custom/page.css" rel="stylesheet">
+{% endblock %}
+{% block scripts %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <script>
+      var options = {
+        valueNames: [ 'fullname', 'sn' ],
+        page: 10,
+        pagination: [{
+            name: "pagination",
+            paginationClass: "pagination",
+            innerWindow: 1,
+            outerWindow: 1,
+        }],
+      };
+
+      /*table = id of the div */
+      var userList = new List('table', options);
+    </script>
+{% endblock %}
+{% block content %}
+  <section id="doclist" class="py-3">
+    <div class="container py-3">
+      <h1 class="my-3">廠商一覽</h1>
+
+      <div class="row">
+        <div class="col-12 my-3">
+          <a role="button" class="btn btn-primary" href="{% url 'Comp_Add' %}">新增</a>
+        </div>
+        <div class="col-12">
+          <div class="table-responsive" id="table">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">搜尋...</span>
+              </div>
+              <input type="text" class="fuzzy-search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col" class="sort" data-sort="fullname">公司名稱</th>
+                  <th scope="col" class="sort fit" data-sort="sn">統編</th>
+                  <th scope="col" class="text-center">聯絡人</th>
+                  <th scope="col" class="text-center">連絡電話</th>
+                  <th scope="col" class="text-center">E-mail</th>
+                </tr>
+              </thead>
+              <tbody class="list">
+                {% for comp in comp_list %}
+                <tr>
+                  <td class="fullname"><a href="{% url 'Comp_Detail' comp.id %}">{{ comp.fullname }}</a></td>
+                  <td class="sn">{{ comp.sn }}</td>
+                  <td class="text-center">{{ comp.spnsr }}</td>
+                  <td class="text-center">
+                    {{ comp.tel }}
+                    {% if comp.tel_ext %} ext:{{ comp.tel_ext }}{% endif %}
+                  </td>
+                  <td class="text-center">{{ comp.email }}</td>
+                </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="6"> Empty </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <nav aria-label="Page navigation">
+              <ul class="pagination"></ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

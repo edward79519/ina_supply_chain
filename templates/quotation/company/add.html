@@ -1,0 +1,133 @@
+{% extends 'frame/base.html' %}
+
+{% block title %}新增廠商 - 寶晶供應鏈管理系統{% endblock %}
+{% block content %}
+  <section id="doclist" class="py-3">
+    <div class="container py-3">
+      <h1 class="my-3">新增廠商</h1>
+      <div class="row">
+        <div class="col-12">
+          <div id="msg" class="text-danger"></div>
+          <div class="text-danger">
+            {% if form.errors %}
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+          </div>
+          <div><small class="form-text text-muted">*為必填欄位</small></div>
+        </div>
+        <div class="col-12">
+          <form method="POST" class="needs-validation" onsubmit="" novalidate>
+            <div class="form-row">
+              {% csrf_token %}
+              <div class="col-12 my-2">{{ form.non_field_errors }}</div>
+              <div class="col-12">
+                <div class="row">
+                  <div class="col-12 col-md-6">
+                    <div class="form-group">
+                      <label for="id_{{ form.fullname.name }}">*公司名稱：</label>
+                      {{ form.fullname }}
+                      <small id="fullnameHelpBlock" class="form-text text-muted">
+                        輸入公司完整名稱。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.fullname.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.shortname.name }}">*公司簡稱：</label>
+                      {{ form.shortname }}
+                      <small id="shortnameHelpBlock" class="form-text text-muted">
+                        輸入公司簡短名稱。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.shortname.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.sn.name }}">*統編：</label>
+                      {{ form.sn }}
+                      <div class="invalid-feedback">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.spnsr.name }}">*聯絡人：</label>
+                      {{ form.spnsr }}
+                      <small id="nameHelpBlock" class="form-text text-muted">
+                        輸入全名。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.spnsr.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.spnsr_shrtname.name }}">別名：</label>
+                      {{ form.spnsr_shrtname }}
+                      <div class="invalid-feedback">
+                        {{ form.spnsr_shrtname.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-8 col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.tel.name }}">*連絡電話：</label>
+                      {{ form.tel }}
+                      <div class="invalid-feedback">
+                        {{ form.tel.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-4 col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.tel_ext.name }}">分機：</label>
+                      {{ form.tel_ext }}
+                      <div class="invalid-feedback">
+                        {{ form.tel_ext.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="id_{{ form.email.name }}">*E-mail：</label>
+                      {{ form.email }}
+                      <div class="invalid-feedback">
+                        {{ form.email.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="id_{{ form.remark.name }}">備註：</label>
+                      {{ form.remark }}
+                      <div class="invalid-feedback">
+                        {{ form.remark.errors }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" name="author" value="{{ request.user.id }}">
+              <div class="col-12">
+                <a role="button" class="btn btn-danger" href="{% url 'Comp_Index' %}">取消</a>
+                <button type="submit" class="btn btn-primary">送出</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
