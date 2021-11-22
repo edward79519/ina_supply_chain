@@ -40,6 +40,9 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'Comp_Index' %}">廠商一覽</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'Item_Lsit' %}">品項一覽</a>
+          </li>
           {% if user.is_superuser %}
             <li class="nav-item">
               <a class="nav-link" href="/admin/">管理員介面</a>

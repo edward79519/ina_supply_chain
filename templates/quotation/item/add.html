@@ -1,0 +1,106 @@
+{% extends 'frame/base.html' %}
+
+{% block title %}新增品項 - 寶晶供應鏈管理系統{% endblock %}
+{% block content %}
+  <section id="doclist" class="py-3">
+    <div class="container py-3">
+      <h1 class="my-3">新增品項</h1>
+      <div class="row">
+        <div class="col-12">
+          <div id="msg" class="text-danger"></div>
+          <div class="text-danger">
+            {% if form.errors %}
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+          </div>
+          <div><small class="form-text text-muted">*為必填欄位</small></div>
+        </div>
+        <div class="col-12">
+          <form method="POST" class="needs-validation" onsubmit="" novalidate>
+            <div class="form-row">
+              {% csrf_token %}
+              <div class="col-12 my-2">{{ form.non_field_errors }}</div>
+              <div class="col-12">
+                <div class="row">
+                  <div class="col-12 col-md-6">
+                    <div class="form-group">
+                      <label for="id_{{ form.name.name }}">*品項名稱：</label>
+                      {{ form.name }}
+                      <small id="fullnameHelpBlock" class="form-text text-muted">
+                        輸入品項完整名稱。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.name.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="form-group">
+                      <label for="id_{{ form.sn.name }}">*料號：</label>
+                      {{ form.sn }}
+                      <small id="shortnameHelpBlock" class="form-text text-muted">
+                        輸入料號。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.sn.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.cate.name }}">*類別：</label>
+                      {{ form.cate }}
+                      <div class="invalid-feedback">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.specmain.name }}">*主規格：</label>
+                      {{ form.specmain }}
+                      <small id="nameHelpBlock" class="form-text text-muted">
+                        輸入主規格。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.specmain.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-6">
+                    <div class="form-group">
+                      <label for="id_{{ form.specsub.name }}">副規格：</label>
+                      {{ form.specsub }}
+                      <div class="invalid-feedback">
+                        {{ form.specsub.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="id_{{ form.remark.name }}">備註：</label>
+                      {{ form.remark }}
+                      <div class="invalid-feedback">
+                        {{ form.remark.errors }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" name="author" value="{{ request.user.id }}">
+              <div class="col-12">
+                <a role="button" class="btn btn-danger" href="{% url 'Comp_Index' %}">取消</a>
+                <button type="submit" class="btn btn-primary">送出</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

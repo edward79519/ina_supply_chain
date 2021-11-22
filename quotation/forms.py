@@ -1,5 +1,5 @@
 from django import forms
-from .models import Company
+from .models import Company, Item
 
 
 class AddCompForm(forms.ModelForm):
@@ -52,4 +52,35 @@ class UpdateCompForm(forms.ModelForm):
             'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'author': forms.HiddenInput(),
             'is_open': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
+        }
+
+
+class AddItemForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        exclude = ['is_inquiry', 'is_open', 'is_new']
+        widgets = {
+            'sn': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'cate': forms.Select(attrs={'class': 'form-control'}),
+            'specmain': forms.TextInput(attrs={'class': 'form-control'}),
+            'specsub': forms.TextInput(attrs={'class': 'form-control'}),
+            'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+        }
+
+
+class UpdateItemForm(forms.ModelForm):
+    class Meta:
+        model = Item
+        exclude = '__all__'
+        widgets = {
+            'sn': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'cate': forms.Select(attrs={'class': 'form-control'}),
+            'specmain': forms.TextInput(attrs={'class': 'form-control'}),
+            'specsub': forms.TextInput(attrs={'class': 'form-control'}),
+            'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'is_open': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
+            'is_inquiry': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
+            'is_new': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
         }

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Company, Item
-from .forms import AddCompForm, UpdateCompForm
+from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm
 
 # Create your views here.
 
@@ -66,5 +66,52 @@ def item_list(request):
     template = loader.get_template("quotation/item/list.html")
     context = {
         'items': items,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def item_detail(request, item_id):
+    item = Item.objects.get(id=item_id)
+    template = loader.get_template("quotation/item/detail.html")
+    context = {
+        'item': item,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def item_add(request):
+    template = loader.get_template("quotation/item/add.html")
+    if request.method == "POST":
+        form = AddItemForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("../")
+        else:
+            print('error')
+            return HttpResponseRedirect("./")
+    else:
+        form = AddItemForm()
+    context = {
+        'form': form,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def item_update(request, item_id):
+    template = loader.get_template("quotation/item/update.html")
+    item = Item.objects.get(id=item_id)
+    if request.method == "POST":
+        form = UpdateItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("../")
+        else:
+            print('error')
+            return HttpResponseRedirect("./")
+    else:
+        form = UpdateItemForm(instance=item)
+    context = {
+        'form': form,
+        'item': item,
     }
     return HttpResponse(template.render(context, request))
