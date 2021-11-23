@@ -1,0 +1,77 @@
+{% extends 'frame/base.html' %}
+
+{% block title %}詢價單 - 詳細資料{% endblock %}
+{% block css %}
+  <link href="/static/custom/page.css" rel="stylesheet">
+{% endblock %}
+{% block scripts %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <script>
+      var options = {
+        valueNames: [ 'pubdate', 'company', 'dept', 'fullsn', 'name', 'abstract', 'addtime' ],
+        page: 10,
+        pagination: [{
+            name: "pagination",
+            paginationClass: "pagination",
+            innerWindow: 1,
+            outerWindow: 1,
+        }],
+      };
+
+      /*table = id of the div */
+      var userList = new List('table', options);
+    </script>
+{% endblock %}
+{% block content %}
+  <section id="basic" class="py-3">
+    <div class="container py-3">
+      <h1 class="my-3">詢價單：{{ inquiry.sn }} - 詳細資料</h1>
+      <a role="button" class="btn btn-primary" href="{% url 'Inquiry_List' %}">回詢價單列表</a>
+      <a role="button" class="btn btn-danger" href="">編輯</a>
+      <div class="row">
+        <div class="col-md-3 my-3">
+          <h6>單號：</h6>
+          <h5 class="font-weight-bold">{{ inquiry.sn }}</h5>
+        </div>
+        <div class="col-md-3 my-3">
+          <h6>詢價類別：</h6>
+          <h5 class="font-weight-bold">{{ inquiry.cate }}</h5>
+        </div>
+        <div class="col-md-3 my-3">
+          <h6>詢價人：</h6>
+          <h5 class="font-weight-bold">{{ inquiry.author }}</h5>
+        </div>
+        <div class="col-md-3 my-3">
+          <h6>詢價狀態：</h6>
+          <h5 class="font-weight-bold">
+            {% if inquiry.status == "詢價中" %}
+              <span class="text-danger">{{ inquiry.status }}</span>
+            {% else %}
+              {{ inquiry.status }}
+            {% endif %}
+          </h5>
+        </div>
+        <div class="col-md-3 my-3">
+          <h6>詢價廠商：</h6>
+          <h5 class="font-weight-bold">{{ inquiry.company.shortname }}</h5>
+        </div>
+        <div class="col-md-3 my-3">
+          <h6>聯絡人：</h6>
+          <h5 class="font-weight-bold">{{ inquiry.company.spnsr }}</h5>
+        </div>
+        <div class="col-md-3 my-3">
+          <h6>詢價日期：</h6>
+          <h5 class="font-weight-bold">{{ inquiry.startdate|date:"Y-m-d" }}</h5>
+        </div>
+        <div class="col-md-3 my-3">
+          <h6>預計完成日期：</h6>
+          <h5 class="font-weight-bold">{{ inquiry.enddate|date:"Y-m-d" }}</h5>
+        </div>
+        <div class="col-12 my-3">
+          <h6>備註：</h6>
+          <h5 class="font-weight-bold">{{ inquiry.remark }}</h5>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

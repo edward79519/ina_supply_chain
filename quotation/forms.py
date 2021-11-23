@@ -1,5 +1,5 @@
 from django import forms
-from .models import Company, Item
+from .models import Company, Item, Inquiry
 
 
 class AddCompForm(forms.ModelForm):
@@ -72,7 +72,7 @@ class AddItemForm(forms.ModelForm):
 class UpdateItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        exclude = '__all__'
+        fields = '__all__'
         widgets = {
             'sn': forms.TextInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -83,4 +83,18 @@ class UpdateItemForm(forms.ModelForm):
             'is_open': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
             'is_inquiry': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
             'is_new': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
+        }
+
+
+class AddInquiryForm(forms.ModelForm):
+    class Meta:
+        model = Inquiry
+        exclude = ['status', 'is_open']
+        widgets = {
+            'cate': forms.Select(attrs={'class': 'form-control'}),
+            'company': forms.Select(attrs={'class': 'form-control'}),
+            'startdate': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'enddate': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'author': forms.Select(attrs={'class': 'form-control', 'disabled': True}),
+            'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }

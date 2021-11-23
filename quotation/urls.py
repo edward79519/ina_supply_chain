@@ -10,4 +10,7 @@ urlpatterns = [
     path('item/add/', views.item_add, name="Item_add"),
     path('item/<int:item_id>/', views.item_detail, name="Item_Detail"),
     path('item/<int:item_id>/update/', views.item_update, name="Item_Update"),
+    path('inquiry/', views.inquiry_list, name="Inquiry_List"),
+    path('inquiry/add/', views.inquiry_add, name="Inquiry_Add"),
+    path('inquiry/<int:inqry_id>/', views.inquiry_detail, name="Inquiry_Detail"),
 ]

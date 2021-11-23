@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Company, Item
-from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm
+from .models import Company, Item, Inquiry
+from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm, AddInquiryForm
+from django.utils import timezone
+
 
 # Create your views here.
 
@@ -113,5 +115,45 @@ def item_update(request, item_id):
     context = {
         'form': form,
         'item': item,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def inquiry_list(request):
+    inquirys = Inquiry.objects.all().order_by("-addtime")
+    template = loader.get_template("quotation/inquiry/list.html")
+    context = {
+        'inquirys': inquirys,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def inquiry_detail(request, inqry_id):
+    inquiry = Inquiry.objects.get(id=inqry_id)
+    template = loader.get_template("quotation/inquiry/detail.html")
+    context = {
+        'inquiry': inquiry,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def inquiry_add(request):
+    template = loader.get_template("quotation/inquiry/add.html")
+    if request.method == "POST":
+        count = Inquiry.objects.filter(addtime__date=timezone.now().date()).count() + 1
+        sn = "{}{}".format(timezone.now().date().strftime("%Y%m%d"), str(count).zfill(3))
+        query = request.POST.copy()
+        query['sn'] = sn
+        form = AddInquiryForm(query, initial={'author': request.user})
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("../")
+        else:
+            print("error")
+            return HttpResponseRedirect("./")
+    else:
+        form = AddInquiryForm(initial={'author': request.user})
+    context = {
+        'form': form,
     }
     return HttpResponse(template.render(context, request))

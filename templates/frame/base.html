@@ -43,6 +43,9 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'Item_Lsit' %}">品項一覽</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'Inquiry_List' %}">詢價單一覽</a>
+          </li>
           {% if user.is_superuser %}
             <li class="nav-item">
               <a class="nav-link" href="/admin/">管理員介面</a>

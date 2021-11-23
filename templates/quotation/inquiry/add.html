@@ -1,0 +1,113 @@
+{% extends 'frame/base.html' %}
+
+{% block title %}新增詢價單 - 寶晶供應鏈管理系統{% endblock %}
+{% block content %}
+  <section id="doclist" class="py-3">
+    <div class="container py-3">
+      <h1 class="my-3">新增詢價單</h1>
+      <div class="row">
+        <div class="col-12">
+          <div id="msg" class="text-danger"></div>
+          <div class="text-danger">
+            {% if form.errors %}
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+          </div>
+          <div><small class="form-text text-muted">*為必填欄位</small></div>
+        </div>
+        <div class="col-12">
+          <form method="POST" class="needs-validation" onsubmit="" novalidate>
+            <div class="form-row">
+              {% csrf_token %}
+              <div class="col-12 my-2">{{ form.non_field_errors }}</div>
+              <div class="col-12">
+                <div class="row">
+                  <div class="col-12 col-md-6">
+                    <div class="form-group">
+                      <label for="id_{{ form.cate.name }}">*詢價類別：</label>
+                      {{ form.cate }}
+                      <small id="fullnameHelpBlock" class="form-text text-muted">
+                        選擇類別。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.cate.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="form-group">
+                      <label for="id_{{ form.company.name }}">*詢價廠商：</label>
+                      {{ form.company }}
+                      <small id="shortnameHelpBlock" class="form-text text-muted">
+                        選擇廠商。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.company.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.startdate.name }}">*詢價時間：</label>
+                      {{ form.startdate }}
+                      <small id="nameHelpBlock" class="form-text text-muted">
+                        選擇時間。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.startdate.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="id_{{ form.enddate.name }}">*預計結束時間：</label>
+                      {{ form.enddate }}
+                      <small id="nameHelpBlock" class="form-text text-muted">
+                        選擇時間。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.enddate.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="id_{{ form.author.name }}">詢價人：</label>
+                      {{ form.author }}
+                      <small id="nameHelpBlock" class="form-text text-muted">
+                        選擇時間。
+                      </small>
+                      <div class="invalid-feedback">
+                        {{ form.author.errors }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="id_{{ form.remark.name }}">備註：</label>
+                      {{ form.remark }}
+                      <div class="invalid-feedback">
+                        {{ form.remark.errors }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" name="author" value="{{ request.user.id }}">
+              <div class="col-12">
+                <a role="button" class="btn btn-danger" href="{% url 'Comp_Index' %}">取消</a>
+                <button type="submit" class="btn btn-primary">送出</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
