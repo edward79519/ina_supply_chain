@@ -1,0 +1,90 @@
+{% extends 'frame/nonavbase.html' %}
+
+{% block title %}Inaenergy{% endblock %}
+{% block content %}
+  <section id="title">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+            <h1 class="my-5">新品項報價</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="quota">
+    <div class="container">
+      <form method="POST" class="needs-validation" onsubmit="" novalidate>
+        <div class="form-row">
+          {% csrf_token %}
+          <div class="col-12">
+            <div class="form-group">
+              <label for="id_{{ form.cate.name }}">*類別：</label>
+              {{ form.cate }}
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label for="id_{{ form.name.name }}">*品項名稱：</label>
+              {{ form.name }}
+              <small id="fullnameHelpBlock" class="form-text text-muted">
+                輸入品項完整名稱。
+              </small>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group">
+              <label for="id_{{ form.specmain.name }}">*主規格：</label>
+              {{ form.specmain }}
+              <small id="nameHelpBlock" class="form-text text-muted">
+                輸入主規格。
+              </small>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group">
+              <label for="id_{{ form.specsub.name }}">副規格：</label>
+              {{ form.specsub }}
+            </div>
+          </div>
+          <div class="col-9">
+            <div class="form-group">
+              <label for="id_{{ qryform.price.name }}">金額：</label>
+              {{ qryform.price }}
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="form-group">
+              <label for="id_{{ qryform.crnt.name }}">幣別：</label>
+              {{ qryform.crnt }}
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group">
+              <label for="id_{{ qryform.qdate.name }}">日期：</label>
+              {{ qryform.qdate }}
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group">
+              <label for="id_{{ form.remark.name }}">備註：</label>
+              {{ form.remark }}
+              <div class="invalid-feedback">
+                {{ form.remark.errors }}
+              </div>
+            </div>
+          </div>
+          <input type="hidden" name="author" value="{{ request.user.id }}">
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary">送出</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+  <script>
+      window.onbeforeunload = function () {
+          window.opener.location.reload();
+      };
+  </script>
+{% endblock %}

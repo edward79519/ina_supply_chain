@@ -1,0 +1,58 @@
+{% extends 'frame/nonavbase.html' %}
+
+{% block title %}Inaenergy{% endblock %}
+{% block content %}
+  <section id="title">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+            <h1 class="my-5">更新報價</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="quota">
+    <div class="container">
+      <div class="row">
+        <div class="col-3">料號：</div>
+        <div class="col-9 font-weight-bold">{{ quota.itemsn.sn }}</div>
+        <div class="col-3">品項：</div>
+        <div class="col-9 font-weight-bold">{{ quota.itemsn.name }}</div>
+        <div class="col-3">規格1：</div>
+        <div class="col-9 font-weight-bold">{{ quota.itemsn.specmain }}</div>
+        <div class="col-3">規格2：</div>
+        <div class="col-9 font-weight-bold">{{ quota.itemsn.specsub }}</div>
+      </div>
+      <form method="POST" class="needs-validation" onsubmit="" novalidate>
+        <div class="form-row">
+          {% csrf_token %}
+          <div class="col-9">
+            <div class="form-group">
+              <label for="id_{{ form.price.name }}">金額：</label>
+              {{ form.price }}
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="form-group">
+              <label for="id_{{ form.crnt.name }}">幣別：</label>
+              {{ form.crnt }}
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group">
+              <label for="id_{{ form.qdate.name }}">日期：</label>
+              {{ form.qdate }}
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">送出</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  <script>
+      window.onbeforeunload = function () {
+          window.opener.location.reload();
+      };
+  </script>
+{% endblock %}

@@ -1,5 +1,6 @@
 from django import forms
-from .models import Company, Item, Inquiry
+from .models import Company, Item, Inquiry, ItemQuota
+from django.utils import timezone
 
 
 class AddCompForm(forms.ModelForm):
@@ -97,4 +98,20 @@ class AddInquiryForm(forms.ModelForm):
             'enddate': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'author': forms.Select(attrs={'class': 'form-control', 'disabled': True}),
             'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+        }
+
+
+class UpdateQuotaForm(forms.ModelForm):
+    class Meta:
+        model = ItemQuota
+        fields = ['price', 'crnt', 'xchgrt', 'qdate']
+        widgets = {
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'crnt': forms.Select(attrs={'class': 'form-control'}),
+            'qdate': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'max': timezone.now().strftime("%Y-%m-%d"),
+            }),
+            'chgrt': forms.NumberInput(attrs={'class': 'form-control'}),
         }

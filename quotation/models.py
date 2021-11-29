@@ -123,17 +123,36 @@ class ItemQuota(ModelBase):
         related_name='itemquota',
     )
     count = models.IntegerField(default=1)
-    price = models.DecimalField(max_digits=14, decimal_places=4)
+    price = models.DecimalField(
+        max_digits=18,
+        decimal_places=4,
+        blank=True,
+        null=True,
+    )
     crnt = models.ForeignKey(
         Current,
         on_delete=models.PROTECT,
         related_name='itemquota',
+        blank=True,
+        null=True,
     )
-    xchgrt = models.DecimalField(max_digits=6, decimal_places=6)
+    xchgrt = models.DecimalField(
+        max_digits=12,
+        decimal_places=6,
+        blank=True,
+        null=True,
+    )
     is_new = models.BooleanField(default=False)
+    qdate = models.DateField(
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return "{}_{}".format(self.inquirysn.sn, self.itemsn.name)
 
     def ntd_price(self):
-        return self.price * self.xchgrt
+        if self.price and self.xchgrt:
+            return self.price * self.xchgrt
+        else:
+            return None

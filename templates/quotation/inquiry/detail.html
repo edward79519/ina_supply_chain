@@ -7,19 +7,15 @@
 {% block scripts %}
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script>
-      var options = {
-        valueNames: [ 'pubdate', 'company', 'dept', 'fullsn', 'name', 'abstract', 'addtime' ],
-        page: 10,
-        pagination: [{
-            name: "pagination",
-            paginationClass: "pagination",
-            innerWindow: 1,
-            outerWindow: 1,
-        }],
+      var optionsold = {
+        valueNames: [ 'id', 'sn', 'name', 'specmain', 'specsub', 'price', 'date' ],
       };
-
+      var optionsnew = {
+        valueNames: [ 'id', 'sn', 'name', 'specmain', 'specsub', 'price', 'date' ],
+      };
       /*table = id of the div */
-      var userList = new List('table', options);
+      var userList = new List('tableold', optionsold);
+      var userListnew = new List('tablenew', optionsnew);
     </script>
 {% endblock %}
 {% block content %}
@@ -74,4 +70,125 @@
       </div>
     </div>
   </section>
+  <section id="quota_list">
+    <div class="container py-3">
+      <div id="quota_old" class="row my-3">
+        <div class="col-12">
+          <h5 class="font-weight-bold">既有品項</h5>
+        </div>
+        <div class="col-12">
+          <div class="table-responsive" id="tableold">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">搜尋...</span>
+              </div>
+              <input type="text" class="fuzzy-search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
+
+            </div>
+            <table class="table table-hover">
+              <thead>
+                <tr class="text-center">
+                  <th scope="col" class="sort fit" data-sort="id">項次</th>
+                  <th scope="col" class="sort fit" data-sort="sn">料號</th>
+                  <th scope="col" class="sort text-center" data-sort="name">品項</th>
+                  <th scope="col" class="sort text-center" data-sort="specmain">規格1</th>
+                  <th scope="col" class="sort text-center fit" data-sort="specsub">規格2</th>
+                  <th scope="col" class="text-center fit">數量</th>
+                  <th scope="col" class="sort text-center fit" data-sort="price">價格(新台幣)</th>
+                  <th scope="col" class="sort text-center fit" data-sort="date">報價日期</th>
+                  <th scope="col" class="text-center">動作</th>
+                </tr>
+              </thead>
+              <tbody class="list">
+                {% for quota in quotas_old %}
+                <tr class="text-center">
+                  <td class="id text-center">{{ forloop.counter }}</td>
+                  <td class="sn">{{ quota.itemsn.sn }}</td>
+                  <td class="name text-center">{{ quota.itemsn.name }}</td>
+                  <td class="specmain text-center">{{ quota.itemsn.specmain }}</td>
+                  <td class="specsub text-center">{{ quota.itemsn.specsub|default_if_none:"" }}</td>
+                  <td class="author text-center">{{ quota.count }}</td>
+                  <td class="price text-center">
+                    {% if quota.ntd_price %}
+                      {{ quota.ntd_price|floatformat:"2g" }}
+                      <br>{% if quota.crnt.code != "TWD"%}({{ quota.crnt.code }} {{ quota.price|floatformat:"2g" }}){% endif %}
+                    {% endif %}
+                  </td>
+                  <td class="date text-center">{{ quota.qdate|date:"Y-m-d" }}</td>
+                  <td class="text-center">
+                    <a class="btn btn-sm btn-primary" onClick="openwindow('{% url "Quota_Inpgupdate" quota.id %}')">更新報價</a>
+                  </td>
+                </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="7" class="text-center"> Empty </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-12">
+          <h5 class="font-weight-bold">新增品項</h5>
+        </div>
+        <div class="col-12">
+          <div class="table-responsive" id="tablenew">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">搜尋...</span>
+              </div>
+              <input type="text" class="fuzzy-search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
+              <a role="button" class="btn btn-danger ml-5" onClick="openwindow('{% url "Quota_Add" inquiry.id %}')">新增</a>
+            </div>
+            <table class="table table-hover">
+              <thead>
+                <tr class="text-center">
+                  <th scope="col" class="sort fit" data-sort="id">項次</th>
+                  <th scope="col" class="sort fit" data-sort="sn">料號</th>
+                  <th scope="col" class="sort text-center" data-sort="name">品項</th>
+                  <th scope="col" class="sort text-center" data-sort="specmain">規格1</th>
+                  <th scope="col" class="sort text-center fit" data-sort="specsub">規格2</th>
+                  <th scope="col" class="text-center fit">數量</th>
+                  <th scope="col" class="sort text-center fit" data-sort="price">價格(新台幣)</th>
+                  <th scope="col" class="sort text-center fit" data-sort="date">報價日期</th>
+                  <th scope="col" class="text-center">動作</th>
+                </tr>
+              </thead>
+              <tbody class="list">
+                {% for quota in quotas_new %}
+                <tr class="text-center">
+                  <td class="id text-center">{{ forloop.counter }}</td>
+                  <td class="sn">{{ quota.itemsn.sn }}</td>
+                  <td class="name text-center">{{ quota.itemsn.name }}</td>
+                  <td class="specmain text-center">{{ quota.itemsn.specmain }}</td>
+                  <td class="specsub text-center">{{ quota.itemsn.specsub|default_if_none:"" }}</td>
+                  <td class="author text-center">{{ quota.count }}</td>
+                  <td class="price text-center">
+                    {% if quota.ntd_price %}
+                      {{ quota.ntd_price|floatformat:"2g" }}
+                      <br>{% if quota.crnt.code != "TWD"%}({{ quota.crnt.code }} {{ quota.price|floatformat:"2g" }}){% endif %}
+                    {% endif %}
+                  </td>
+                  <td class="date text-center">{{ quota.qdate|date:"Y-m-d" }}</td>
+                  <td class="text-center">
+                    <a class="btn btn-sm btn-primary" onClick="openwindow('{% url "Quota_Inpgupdate" quota.id %}')">更新報價</a>
+                  </td>
+                </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="8" class="text-center"> Empty </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+        function openwindow (url) {
+          window.open(url,'','width=560, height=500, location=no, left=100, top=100');
+        }
+    </script>
 {% endblock %}
