@@ -22,8 +22,12 @@ def comp_list(request):
 def comp_detail(request, comp_id):
     comp = Company.objects.get(id=comp_id)
     template = loader.get_template('quotation/company/detail.html')
+    inquirys = comp.inquirys.filter(is_open=True)
+    itemquotas = ItemQuota.objects.filter(inquirysn__company_id=comp_id)
     context = {
-        'comp': comp
+        'comp': comp,
+        'inquirys': inquirys,
+        'itemquotas': itemquotas,
     }
     return HttpResponse(template.render(context, request))
 
@@ -75,9 +79,22 @@ def item_list(request):
 
 def item_detail(request, item_id):
     item = Item.objects.get(id=item_id)
+    quotas = ItemQuota.objects.filter(itemsn_id=item_id).order_by("-qdate")
+    time_arr = []
+    price_arr = []
+    for q in quotas:
+        if q.qdate and q.ntd_price():
+            time_arr.append(q.qdate.strftime("%Y-%m-%d"))
+            price_arr.append(float(q.ntd_price()))
+    quota_data = {
+        "time": time_arr,
+        "price": price_arr,
+    }
     template = loader.get_template("quotation/item/detail.html")
     context = {
         'item': item,
+        'quotas': quotas,
+        'quota_data': quota_data,
     }
     return HttpResponse(template.render(context, request))
 

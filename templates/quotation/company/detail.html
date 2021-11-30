@@ -8,18 +8,30 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script>
       var options = {
-        valueNames: [ 'pubdate', 'company', 'dept', 'fullsn', 'name', 'abstract', 'addtime' ],
-        page: 10,
+        valueNames: [ 'sn', 'cate', 'comp', 'spec', 'date', 'author', 'status'],
+        page: 5,
         pagination: [{
-            name: "pagination",
-            paginationClass: "pagination",
+            name: "paginationinqry",
+            paginationClass: "paginationinqry",
             innerWindow: 1,
             outerWindow: 1,
         }],
       };
-
       /*table = id of the div */
-      var userList = new List('table', options);
+      var userList = new List('tableinquiry', options);
+
+      var optionsquota = {
+        valueNames: [ 'id', 'sn', 'name', 'specmain', 'specsub', 'price', 'date' ],
+        page: 5,
+        pagination: [{
+            name: "paginationquota",
+            paginationClass: "paginationquota",
+            innerWindow: 1,
+            outerWindow: 1,
+        }],
+      };
+      /*table = id of the div */
+      var quotaList = new List('tablequota', optionsquota);
     </script>
 {% endblock %}
 {% block content %}
@@ -56,6 +68,133 @@
         <div class="col-12 my-3">
           <h6>備註：</h6>
           <h5 class="font-weight-bold">{{ comp.remark }}</h5>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="inqy_list" class="py-3">
+    <div class="container py-3">
+      <h4 class="my-1 font-weight-bold">詢價單一覽</h4>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="table-responsive" id="tableinquiry">
+            <div class="row">
+              <div class="col-6">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">搜尋...</span>
+                  </div>
+                  <input type="text" class="fuzzy-search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+              </div>
+              <div class="col-6">
+                <nav aria-label="Page navigation">
+                  <ul class="pagination paginationinqry justify-content-end"></ul>
+                </nav>
+              </div>
+            </div>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col" class="sort" data-sort="sn">單號</th>
+                  <th scope="col" class="sort fit" data-sort="cate">類別</th>
+                  <th scope="col" class="sort text-center" data-sort="comp">廠商</th>
+                  <th scope="col" class="sort text-center" data-sort="spec">聯絡人</th>
+                  <th scope="col" class="sort text-center" data-sort="date">詢價日期</th>
+                  <th scope="col" class="sort text-center" data-sort="author">詢價人</th>
+                  <th scope="col" class="sort text-center fit" data-sort="status">狀態</th>
+                </tr>
+              </thead>
+              <tbody class="list">
+                {% for inquiry in inquirys %}
+                <tr>
+                  <td class="sn"><a href="{% url 'Inquiry_Detail' inquiry.id %}">{{ inquiry.sn }}</a></td>
+                  <td class="cate">{{ inquiry.cate }}</td>
+                  <td class="comp text-center">{{ inquiry.company.shortname }}</td>
+                  <td class="spec text-center">{{ inquiry.company.spnsr }}</td>
+                  <td class="date text-center">{{ inquiry.startdate|date:"Y-m-d" }}</td>
+                  <td class="author text-center">{{ inquiry.author }}</td>
+                  <td class="status text-center">{{ inquiry.status }}</td>
+                </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="7" class="text-center"> Empty </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="quota_list">
+    <div class="container">
+      <div id="quota" class="row my-3">
+        <div class="col-12">
+          <h5 class="font-weight-bold">報價一覽</h5>
+        </div>
+        <div class="col-12">
+          <div class="table-responsive" id="tablequota">
+            <div class="row">
+              <div class="col-6">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">搜尋...</span>
+                  </div>
+                  <input type="text" class="fuzzy-search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+              </div>
+              <div class="col-6">
+                <nav aria-label="Page navigation">
+                  <ul class="paginationquota pagination justify-content-end"></ul>
+                </nav>
+              </div>
+            </div>
+            <table class="table table-hover">
+              <thead>
+                <tr class="text-center">
+                  <th scope="col" class="sort fit" data-sort="id">項次</th>
+                  <th scope="col" class="sort fit" data-sort="sn">料號</th>
+                  <th scope="col" class="sort text-center" data-sort="name">品項</th>
+                  <th scope="col" class="sort text-center" data-sort="specmain">規格1</th>
+                  <th scope="col" class="sort text-center fit" data-sort="specsub">規格2</th>
+                  <th scope="col" class="text-center fit">數量</th>
+                  <th scope="col" class="sort text-center fit" data-sort="price">價格(新台幣)</th>
+                  <th scope="col" class="sort text-center fit" data-sort="date">報價日期</th>
+                </tr>
+              </thead>
+              <tbody class="list">
+                {% for quota in itemquotas %}
+                <tr class="text-center">
+                  <td class="id text-center">{{ forloop.counter }}</td>
+                  <td class="sn">{{ quota.itemsn.sn }}</td>
+                  <td class="name text-center">{{ quota.itemsn.name }}</td>
+                  <td class="specmain text-center">{{ quota.itemsn.specmain }}</td>
+                  <td class="specsub text-center">{{ quota.itemsn.specsub|default_if_none:"" }}</td>
+                  <td class="author text-center">{{ quota.count }}</td>
+                  <td class="price text-center">
+                    {% if quota.ntd_price %}
+                      {{ quota.ntd_price|floatformat:"2g" }}
+                      <br>{% if quota.crnt.code != "TWD"%}({{ quota.crnt.code }} {{ quota.price|floatformat:"2g" }}){% endif %}
+                    {% endif %}
+                  </td>
+                  <td class="date text-center">{{ quota.qdate|date:"Y-m-d" }}</td>
+                </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="9" class="text-center"> Empty </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <nav aria-label="Page navigation">
+              <ul class="pagination pagination-sm justify-content-end"></ul>
+            </nav>
+          </div>
         </div>
       </div>
     </div>
