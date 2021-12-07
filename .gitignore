@@ -4,3 +4,4 @@ default.db.sqlite3
 supplyChain/settings.py
 pymssql-2.2.2-cp38-cp38-win_amd64.whl
 /quotation/custom/secret.cfg
+python_ldap-3.3.1-cp38-cp38-win_amd64.whl

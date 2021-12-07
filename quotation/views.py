@@ -5,6 +5,7 @@ from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm, Add
 from django.utils import timezone
 from datetime import datetime
 from .custom.exchange import getrate
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -32,6 +33,7 @@ def comp_detail(request, comp_id):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def comp_add(request):
     template = loader.get_template('quotation/company/add.html')
     if request.method == "POST":
@@ -49,6 +51,7 @@ def comp_add(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def comp_update(request, comp_id):
     template = loader.get_template('quotation/company/update.html')
     comp = Company.objects.get(id=comp_id)
@@ -99,6 +102,7 @@ def item_detail(request, item_id):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def item_add(request):
     template = loader.get_template("quotation/item/add.html")
     if request.method == "POST":
@@ -117,6 +121,7 @@ def item_add(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def item_update(request, item_id):
     template = loader.get_template("quotation/item/update.html")
     item = Item.objects.get(id=item_id)
@@ -160,6 +165,7 @@ def inquiry_detail(request, inqry_id):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def inquiry_add(request):
     template = loader.get_template("quotation/inquiry/add.html")
     if request.method == "POST":
@@ -186,6 +192,7 @@ def inquiry_add(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def inquiry_close(request, inqry_id):
     inqry = Inquiry.objects.get(id=inqry_id)
     inqry.status = Inquiry.Status.END
@@ -193,6 +200,7 @@ def inquiry_close(request, inqry_id):
     return HttpResponseRedirect("../")
 
 
+@login_required
 def quota_inpageupdate(request, quota_id):
     template = loader.get_template("quotation/inquiry/quota/inpgupdate.html")
     quota = ItemQuota.objects.get(id=quota_id)
@@ -217,6 +225,7 @@ def quota_inpageupdate(request, quota_id):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def quota_newadd(request, inqry_id):
     template = loader.get_template("quotation/inquiry/quota/newadd.html")
     inqry = Inquiry.objects.get(id=inqry_id)
