@@ -9,7 +9,7 @@
   <script>
     /* list.js config*/
     var options = {
-      valueNames: [ 'pubdate', 'company', 'dept', 'fullsn', 'name', 'abstract', 'addtime' ],
+      valueNames: [ 'inqry', 'comp', 'price_origin', 'price', 'date'],
       page: 10,
       pagination: [{
           name: "pagination",
@@ -129,12 +129,14 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-12">
+        <div class="col-12" id="table">
           <table class="table table-hover">
               <thead>
                 <tr class="text-center">
                   <th scope="col" class="sort" data-sort="inqry">報價單</th>
                   <th scope="col" class="sort" data-sort="comp">廠商</th>
+                  <th scope="col" class="sort text-right" data-sort="price_origin">報價</th>
+                  <th scope="col" class="text-right">幣別(匯率)</th>
                   <th scope="col" class="sort text-right" data-sort="price">報價(新台幣)</th>
                   <th scope="col" class="sort" data-sort="date">時間</th>
                 </tr>
@@ -146,6 +148,12 @@
                       <a href="{% url 'Inquiry_Detail' quota.inquirysn.id %}">{{ quota.inquirysn.sn }}</a>
                     </td>
                     <td class="comp">{{ quota.inquirysn.company.shortname }}</td>
+                    <td class="price_origin text-right fit">{{ quota.price|floatformat:"2g" }}</td>
+                    <td class="text-right fit">
+                      {% if quota.price %}
+                        {{ quota.crnt.name }}({{ quota.xchgrt|floatformat:"2g" }})
+                      {% endif %}
+                    </td>
                     <td class="price text-right fit">{{ quota.ntd_price|floatformat:"2g" }}</td>
                     <td class="date">{{ quota.qdate|date:"Y-m-d" }}</td>
                   </tr>

@@ -122,6 +122,7 @@ def item_update(request, item_id):
     item = Item.objects.get(id=item_id)
     if request.method == "POST":
         form = UpdateItemForm(request.POST, instance=item)
+        print(form)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect("../")
@@ -183,6 +184,13 @@ def inquiry_add(request):
         'form': form,
     }
     return HttpResponse(template.render(context, request))
+
+
+def inquiry_close(request, inqry_id):
+    inqry = Inquiry.objects.get(id=inqry_id)
+    inqry.status = Inquiry.Status.END
+    inqry.save()
+    return HttpResponseRedirect("../")
 
 
 def quota_inpageupdate(request, quota_id):

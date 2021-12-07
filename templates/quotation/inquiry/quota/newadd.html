@@ -86,5 +86,8 @@
       window.onbeforeunload = function () {
           window.opener.location.reload();
       };
+      $(document).ready(function() {
+          $('#id_specmain, #id_specsub, #id_name').prop('disabled', false);
+      });
   </script>
 {% endblock %}

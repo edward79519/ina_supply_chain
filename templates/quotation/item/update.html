@@ -113,7 +113,7 @@
               <input type="hidden" name="author" value="{{ request.user.id }}">
               <div class="col-12">
                 <a role="button" class="btn btn-danger" href="{% url 'Comp_Index' %}">取消</a>
-                <button type="submit" class="btn btn-primary">送出</button>
+                <button type="submit" class="btn btn-primary" id="submit">送出</button>
               </div>
             </div>
           </form>
@@ -121,4 +121,13 @@
       </div>
     </div>
   </section>
+{% endblock %}
+{% block scripts %}
+  <script>
+    $(document).ready(function (){
+        $(document).on('click', '#submit', function (){
+          $('input, select').prop('disabled', false);
+        });
+    });
+  </script>
 {% endblock %}

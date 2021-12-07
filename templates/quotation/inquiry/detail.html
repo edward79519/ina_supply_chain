@@ -23,7 +23,9 @@
     <div class="container py-3">
       <h1 class="my-3">詢價單：{{ inquiry.sn }} - 詳細資料</h1>
       <a role="button" class="btn btn-primary" href="{% url 'Inquiry_List' %}">回詢價單列表</a>
-      <a role="button" class="btn btn-danger" href="">編輯</a>
+      {% if inquiry.status == "詢價中" %}
+        <a role="button" class="btn btn-danger" href="{% url 'Inquiry_Close' inquiry.id %}">結案</a>
+      {% endif %}
       <div class="row">
         <div class="col-md-3 my-3">
           <h6>單號：</h6>
@@ -96,14 +98,14 @@
                   <th scope="col" class="text-center fit">數量</th>
                   <th scope="col" class="sort text-center fit" data-sort="price">價格(新台幣)</th>
                   <th scope="col" class="sort text-center fit" data-sort="date">報價日期</th>
-                  <th scope="col" class="text-center">動作</th>
+                  <th scope="col" class="text-center fit">動作</th>
                 </tr>
               </thead>
               <tbody class="list">
                 {% for quota in quotas_old %}
                 <tr class="text-center">
                   <td class="id text-center">{{ forloop.counter }}</td>
-                  <td class="sn">{{ quota.itemsn.sn }}</td>
+                  <td class="sn"><a href="{% url 'Item_Detail' quota.itemsn.id %}">{{ quota.itemsn.sn }}</a></td>
                   <td class="name text-center">{{ quota.itemsn.name }}</td>
                   <td class="specmain text-center">{{ quota.itemsn.specmain }}</td>
                   <td class="specsub text-center">{{ quota.itemsn.specsub|default_if_none:"" }}</td>
@@ -116,7 +118,9 @@
                   </td>
                   <td class="date text-center">{{ quota.qdate|date:"Y-m-d" }}</td>
                   <td class="text-center">
-                    <a class="btn btn-sm btn-primary" onClick="openwindow('{% url "Quota_Inpgupdate" quota.id %}')">更新報價</a>
+                    {% if inquiry.status == "詢價中" %}
+                      <a class="btn btn-sm btn-primary" onClick="openwindow('{% url "Quota_Inpgupdate" quota.id %}')">更新報價</a>
+                    {% endif %}
                   </td>
                 </tr>
                 {% empty %}
@@ -140,7 +144,9 @@
                 <span class="input-group-text" id="basic-addon1">搜尋...</span>
               </div>
               <input type="text" class="fuzzy-search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
-              <a role="button" class="btn btn-danger ml-5" onClick="openwindow('{% url "Quota_Add" inquiry.id %}')">新增</a>
+              {% if inquiry.status == "詢價中" %}
+                <a role="button" class="btn btn-danger ml-5" onClick="openwindow('{% url "Quota_Add" inquiry.id %}')">新增</a>
+              {% endif %}
             </div>
             <table class="table table-hover">
               <thead>
@@ -173,7 +179,9 @@
                   </td>
                   <td class="date text-center">{{ quota.qdate|date:"Y-m-d" }}</td>
                   <td class="text-center">
-                    <a class="btn btn-sm btn-primary" onClick="openwindow('{% url "Quota_Inpgupdate" quota.id %}')">更新報價</a>
+                    {% if inquiry.status == "詢價中" %}
+                      <a class="btn btn-sm btn-primary" onClick="openwindow('{% url "Quota_Inpgupdate" quota.id %}')">更新報價</a>
+                    {% endif %}
                   </td>
                 </tr>
                 {% empty %}
