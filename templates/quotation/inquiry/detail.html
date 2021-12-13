@@ -167,7 +167,7 @@
                 {% for quota in quotas_new %}
                 <tr class="text-center">
                   <td class="id text-center">{{ forloop.counter }}</td>
-                  <td class="sn">{{ quota.itemsn.sn }}</td>
+                  <td class="sn"><a href="{% url 'Item_Detail' quota.itemsn.id %}">{{ quota.itemsn.sn }}</a></td>
                   <td class="name text-center">{{ quota.itemsn.name }}</td>
                   <td class="specmain text-center">{{ quota.itemsn.specmain }}</td>
                   <td class="specsub text-center">{{ quota.itemsn.specsub|default_if_none:"" }}</td>
