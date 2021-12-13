@@ -76,7 +76,7 @@
           </div>
           <input type="hidden" name="author" value="{{ request.user.id }}">
           <div class="col-12">
-            <button type="submit" class="btn btn-primary">送出</button>
+            <button type="submit" class="btn btn-primary" id="submit">送出</button>
           </div>
         </div>
       </form>
@@ -88,6 +88,9 @@
       };
       $(document).ready(function() {
           $('#id_specmain, #id_specsub, #id_name').prop('disabled', false);
+          $(document).on('click', '#submit', function () {
+              $('select').prop('disabled', false);
+          });
       });
   </script>
 {% endblock %}
