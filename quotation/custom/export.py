@@ -148,9 +148,10 @@ def to_excel(data):
                 col.protection = Protection(locked=True)
     [year, month] = dt.datetime.now().strftime('%Y-%m').split('-')
 
-    file_path = os.path.join('static', 'files', 'inquiry', 'output', year, month)
+    file_path = os.path.join(BASE_DIR, 'static', 'files', 'inquiry', 'output', year, month)
     if not os.path.exists(file_path):
         os.makedirs(file_path)
+    print(file_path)
     file_name = "{}_{}_詢價單{}_{}.xlsx".format(
         data['company'], data['category'], data['inquiryid'], dt.datetime.now().strftime("%Y%m%d%H%M%S"))
     wb.save(os.path.join(BASE_DIR, file_path, file_name))
