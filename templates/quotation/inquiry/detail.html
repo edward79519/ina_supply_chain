@@ -23,6 +23,7 @@
     <div class="container py-3">
       <h1 class="my-3">詢價單：{{ inquiry.sn }} - 詳細資料</h1>
       <a role="button" class="btn btn-primary" href="{% url 'Inquiry_List' %}">回詢價單列表</a>
+      <a role="button" class="btn btn-secondary" href="{% url 'Inquiry_Eptxls' inquiry.id %}">匯出詢價單</a>
       {% if inquiry.status == "詢價中" %}
         <a role="button" class="btn btn-danger" href="{% url 'Inquiry_Close' inquiry.id %}">結案</a>
       {% endif %}
@@ -112,8 +113,8 @@
                   <td class="author text-center">{{ quota.count }}</td>
                   <td class="price text-center">
                     {% if quota.ntd_price %}
-                      {{ quota.ntd_price|floatformat:"2g" }}
-                      <br>{% if quota.crnt.code != "TWD"%}({{ quota.crnt.code }} {{ quota.price|floatformat:"2g" }}){% endif %}
+                      {{ quota.crnt.code }} {{ quota.price|floatformat:"2g" }}
+                      {% if quota.crnt.code != "TWD"%}<br>({{ quota.ntd_price|floatformat:"2g" }}){% endif %}
                     {% endif %}
                   </td>
                   <td class="date text-center">{{ quota.qdate|date:"Y-m-d" }}</td>
@@ -173,8 +174,8 @@
                   <td class="author text-center">{{ quota.count }}</td>
                   <td class="price text-center">
                     {% if quota.ntd_price %}
-                      {{ quota.ntd_price|floatformat:"2g" }}
-                      <br>{% if quota.crnt.code != "TWD"%}({{ quota.crnt.code }} {{ quota.price|floatformat:"2g" }}){% endif %}
+                      {{ quota.crnt.code }}{{ quota.price|floatformat:"2g" }}
+                      <br>{% if quota.crnt.code != "TWD"%}( {{ quota.ntd_price.price|floatformat:"2g" }}){% endif %}
                     {% endif %}
                   </td>
                   <td class="date text-center">{{ quota.qdate|date:"Y-m-d" }}</td>

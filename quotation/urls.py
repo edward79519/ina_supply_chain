@@ -16,6 +16,7 @@ urlpatterns = [
     path('inquiry/<int:inqry_id>/', views.inquiry_detail, name="Inquiry_Detail"),
     path('inquiry/<int:inqry_id>/addnewquota/', views.quota_newadd, name="Quota_Add"),
     path('inquiry/<int:inqry_id>/close/', views.inquiry_close, name="Inquiry_Close"),
+    path('inquiry/<int:inqry_id>/exportxls', views.inquiry_export, name="Inquiry_Eptxls"),
     path('quota/<int:quota_id>/', views.quota_inpageupdate, name="Quota_Inpgupdate"),
     path('ajax/itemdetail/', ajax.getdetail, name="Ajax_Getitem"),
 ]

@@ -22,10 +22,10 @@ $(document).ready(function() {
                         $('#id_specsub').val(data.item_specsub);
                         $('#id_cate').prop('disabled', false);
                         $('#id_cate').find("option:contains("+ cate_name +")").prop('selected', true);
-                        $('#id_name, #id_sn, #id_specmain, #id_specsub').prop('disabled', true);
+                        $('#id_name, #id_sn, #id_specmain, #id_specsub, #id_cate').prop('disabled', true);
                     } else {
                         $('#searchmsg').text(res.result);
-                        $('#id_name, #id_sn, #id_specmain, #id_specsub').val("");
+                        $('#id_name, #id_sn, #id_specmain, #id_specsub, #id_cate').val("");
                     }
                 },
             });

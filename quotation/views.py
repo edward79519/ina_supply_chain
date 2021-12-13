@@ -1,12 +1,13 @@
 from django.template import loader
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .models import Company, Item, Inquiry, ItemQuota, Current
 from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm, AddInquiryForm, UpdateQuotaForm
 from django.utils import timezone
 from datetime import datetime
 from .custom.exchange import getrate
 from django.contrib.auth.decorators import login_required
-
+from .custom import export
+from pathlib import Path, PurePath
 
 # Create your views here.
 
@@ -198,6 +199,35 @@ def inquiry_close(request, inqry_id):
     inqry.status = Inquiry.Status.END
     inqry.save()
     return HttpResponseRedirect("../")
+
+
+@login_required
+def inquiry_export(request, inqry_id):
+    inquiry = Inquiry.objects.get(id=inqry_id)
+    quotas_old = ItemQuota.objects.filter(inquirysn_id=inqry_id, is_new=False)
+    data = {
+        'inquiryid': inquiry.sn,
+        'date': inquiry.startdate,
+        'author': inquiry.author.last_name+inquiry.author.first_name,
+        'author_tel': '02-2796-1122',
+        'company': inquiry.company.fullname,
+        'comp_contact': inquiry.company.spnsr,
+        'contact_tel': '{} ext:{}'.format(inquiry.company.tel, inquiry.company.tel_ext),
+        'category': inquiry.cate.name,
+        'quotas': [],
+    }
+
+    if quotas_old.count() != 0:
+        for quota in quotas_old:
+            data['quotas'].append({
+                'item_name': quota.itemsn.name,
+                'item_spec': quota.itemsn.specmain,
+            })
+    file_name = export.to_excel(data)
+    file_date = file_name.split("_")[3][0:6]
+    [ fyear, fmon ] = [file_date[0:4], file_date[4:6]]
+    print(fyear, fmon)
+    return HttpResponseRedirect("/static/files/inquiry/output/{}/{}/{}".format(fyear, fmon, file_name))
 
 
 @login_required
