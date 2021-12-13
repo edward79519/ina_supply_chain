@@ -58,7 +58,7 @@
                   <td class="fullname">{{ item.name }}</td>
                   <td class="category text-center">{{ item.cate }}</td>
                   <td class="spec text-center">{{ item.specmain }}</td>
-                  <td class="text-center">{{ item.specsub }}</td>
+                  <td class="text-center">{% if item.specsub %}{{ item.specsub }}{% endif %}</td>
 {#                  <td class=""></td>#}
                   <td class="text-center">{% if item.is_inquiry %}是{% else %}否{% endif %}</td>
                 </tr>

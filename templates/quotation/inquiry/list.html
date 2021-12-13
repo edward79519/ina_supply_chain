@@ -59,7 +59,7 @@
                   <td class="comp text-center">{{ inquiry.company.shortname }}</td>
                   <td class="spec text-center">{{ inquiry.company.spnsr }}</td>
                   <td class="date text-center">{{ inquiry.startdate|date:"Y-m-d" }}</td>
-                  <td class="author text-center">{{ inquiry.author }}</td>
+                  <td class="author text-center">{{ inquiry.author.last_name }}{{ inquiry.author.first_name }}</td>
                   <td class="status text-center">{{ inquiry.status }}</td>
                 </tr>
                 {% empty %}
