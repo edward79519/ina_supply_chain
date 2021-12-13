@@ -32,6 +32,6 @@ $(document).ready(function() {
         }
     });
     $(document).on('click', '#submit', function () {
-        $('input').prop('disabled', false);
+        $('input, select').prop('disabled', false);
     });
 });
