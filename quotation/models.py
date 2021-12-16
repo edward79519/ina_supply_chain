@@ -63,6 +63,16 @@ class Item(ModelBase):
     def __str__(self):
         return "{}_{}_{}".format(self.sn, self.cate.name, self.name)
 
+    def last_quotatime(self):
+        last_quota = self.itemquota.all().order_by("-qdate").first()
+        if last_quota:
+            if last_quota.qdate:
+                return last_quota.qdate.strftime("%Y-%m-%d")
+            else:
+                return None
+        else:
+            return None
+
 
 class Inquiry(ModelBase):
 
@@ -101,6 +111,20 @@ class Inquiry(ModelBase):
 
     def __str__(self):
         return "{}_{}_{}".format(self.sn, self.cate.name, self.company.shortname)
+
+    def last_quotatime(self):
+        last_itemquota = self.itemquota.all().order_by("-qdate").first()
+        if last_itemquota:
+            if last_itemquota.qdate:
+                return last_itemquota.qdate.strftime("%Y-%m-%d")
+            else:
+                return None
+        else:
+            return None
+        # if self.itemquota.all().order_by("-qdate").first().qdate:
+        #     return self.itemquota.all().order_by("-qdate").first().qdate.strftime("%Y-%m-%d")
+        # else:
+        #     return None
 
 
 class Current(models.Model):

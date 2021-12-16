@@ -80,15 +80,19 @@ def to_excel(data):
         row_h = ws.row_dimensions[7].height
         ws.row_dimensions[19 + row_shift].height = row_h
 
-    # if idx > 9:
-    #     ws.insert_rows(9 + idx)
-    #     ws.cell(row=rowcnt, column=1, value=rowcnt + 1)
+
     # 詢價品項填入表格內
     maxl_b = 0
     maxl_c = 0
     for idx, row in enumerate(data['quotas'], start=0):
         rowcnt = 9 + idx
 
+        # 複製上一列表格格式
+        for colcnt in range(7):
+            from_style = ws.cell(row=rowcnt - 1, column=colcnt + 1)._style
+            ws.cell(row=rowcnt, column=colcnt + 1)._style = from_style
+            ws.cell(row=rowcnt, column=colcnt + 1).number_format = ws.cell(row=rowcnt - 1,
+                                                                           column=colcnt + 1).number_format
         # 填入項次
         ws.cell(row=rowcnt, column=1, value=idx + 1)
 
@@ -106,20 +110,17 @@ def to_excel(data):
 
         ws.cell(row=rowcnt, column=4, value=1)  # 填入數量1
         data_val.add(ws['E{}'.format(rowcnt)])
+
         ws.cell(row=rowcnt, column=5).protection = Protection(locked=False)  # 解鎖可填寫區域
+        print(ws.cell(row=rowcnt, column=5), ws.cell(row=rowcnt, column=5).protection)
         ws.cell(row=rowcnt, column=6).protection = Protection(locked=False)  # 解鎖可填寫區域
+        print(ws.cell(row=rowcnt, column=6), ws.cell(row=rowcnt, column=5).protection)
         ws.cell(row=rowcnt, column=7).value = "=D{}*F{}".format(rowcnt, rowcnt)
 
-        # 複製上一列表格格式
-        for colcnt in range(7):
-            from_style = ws.cell(row=rowcnt-1, column=colcnt+1)._style
-            ws.cell(row=rowcnt, column=colcnt+1)._style = from_style
-            ws.cell(row=rowcnt, column=colcnt+1).number_format = ws.cell(row=rowcnt-1, column=colcnt+1).number_format
 
     # 調整欄寬
     ws.column_dimensions['B'].width = maxl_b * 1.5
     ws.column_dimensions['C'].width = maxl_c * 1.5
-
     # 設定幣別欄位只能用選項
     #data_val.add('E21:E30')
 

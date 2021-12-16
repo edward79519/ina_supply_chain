@@ -8,7 +8,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script>
       var options = {
-        valueNames: [ 'sn', 'cate', 'comp', 'spec', 'date', 'author', 'status'],
+        valueNames: [ 'sn', 'cate', 'comp', 'spec', 'date', 'author', 'status', 'qdate'],
         page: 10,
         pagination: [{
             name: "pagination",
@@ -48,6 +48,7 @@
                   <th scope="col" class="sort text-center" data-sort="spec">聯絡人</th>
                   <th scope="col" class="sort text-center" data-sort="date">詢價日期</th>
                   <th scope="col" class="sort text-center" data-sort="author">詢價人</th>
+                  <th scope="col" class="sort text-center fit" data-sort="qdate">最新報價日</th>
                   <th scope="col" class="sort text-center fit" data-sort="status">狀態</th>
                 </tr>
               </thead>
@@ -60,6 +61,7 @@
                   <td class="spec text-center">{{ inquiry.company.spnsr }}</td>
                   <td class="date text-center">{{ inquiry.startdate|date:"Y-m-d" }}</td>
                   <td class="author text-center">{{ inquiry.author.last_name }}{{ inquiry.author.first_name }}</td>
+                  <td class="qdate text-center">{% if inquiry.last_quotatime %}{{ inquiry.last_quotatime }}{% endif %}</td>
                   <td class="status text-center">{{ inquiry.status }}</td>
                 </tr>
                 {% empty %}
