@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Company, Category, Item, Current, Inquiry, ItemQuota
+from .models import Company, Category, Item, Current, Inquiry, ItemQuota, Manufacturer
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
@@ -10,5 +10,4 @@ admin.site.register(Item)
 admin.site.register(Current)
 admin.site.register(Inquiry)
 admin.site.register(ItemQuota)
-
-# Register for history
+admin.site.register(Manufacturer)

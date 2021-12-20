@@ -67,11 +67,14 @@ class Item(ModelBase):
         on_delete=models.PROTECT,
         related_name='items',
     )
+    mfg = models.ForeignKey(
+        Manufacturer,
+        on_delete=models.PROTECT,
+        related_name='items'
+    )
     specmain = models.CharField(max_length=100)
-    specsub = models.CharField(max_length=100, blank=True, null=True)
     remark = models.CharField(max_length=250, blank=True, null=True)
     is_inquiry = models.BooleanField(default=True)
-    is_new = models.BooleanField(default=True)
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,

@@ -1,6 +1,6 @@
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from .models import Company, Item, Inquiry, ItemQuota, Current
+from .models import Company, Item, Inquiry, ItemQuota, Current, Category, Manufacturer
 from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm, AddInquiryForm, UpdateQuotaForm
 from django.utils import timezone
 from datetime import datetime
@@ -107,7 +107,13 @@ def item_detail(request, item_id):
 def item_add(request):
     template = loader.get_template("quotation/item/add.html")
     if request.method == "POST":
-        form = AddItemForm(request.POST)
+        cate = Category.objects.get(id=request.POST['cate']).sn
+        mfg = Manufacturer.objects.get(id=request.POST['mfg']).sn
+        spec = request.POST['specmain'].zfill(8)
+        sn = '{}{}{}'.format(cate, mfg, spec)
+        new_reqst = request.POST.copy()
+        new_reqst['sn'] = sn
+        form = AddItemForm(new_reqst)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect("../")

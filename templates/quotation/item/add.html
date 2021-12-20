@@ -1,6 +1,5 @@
 {% extends 'frame/base.html' %}
 {% block scripts %}
-  <script src="/static/custom/queryitem.js"></script>
 {% endblock %}
 {% block title %}新增品項 - 寶晶供應鏈管理系統{% endblock %}
 {% block content %}
@@ -8,19 +7,6 @@
     <div class="container py-3">
       <h1 class="my-3">新增品項</h1>
       <div class="row">
-        <div class="col-12">
-          <div class="form-group">
-            <label for="searchitemsn">搜尋庫存系統物品</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="searchitemPrepend">料號</span>
-              </div>
-              <input class="form-control" type="text" id="searchitemsn" pattern="[A-Z][0-9]{11}" maxlength="12" size="12">
-              <button class="btn btn-dark ml-3" id="dbsearch">搜尋</button>
-            </div>
-          </div>
-          <div class="text-danger" id="searchmsg"></div>
-        </div>
         <div class="col-12">
           <div id="msg" class="text-danger"></div>
           <div class="text-danger">
@@ -42,31 +28,7 @@
               <div class="col-12 my-2">{{ form.non_field_errors }}</div>
               <div class="col-12">
                 <div class="row">
-                  <div class="col-12 col-md-6">
-                    <div class="form-group">
-                      <label for="id_{{ form.name.name }}">*品項名稱：</label>
-                      {{ form.name }}
-                      <small id="fullnameHelpBlock" class="form-text text-muted">
-                        輸入品項完整名稱。
-                      </small>
-                      <div class="invalid-feedback">
-                        {{ form.name.errors }}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <div class="form-group">
-                      <label for="id_{{ form.sn.name }}">*料號：</label>
-                      {{ form.sn }}
-                      <small id="shortnameHelpBlock" class="form-text text-muted">
-                        輸入料號。
-                      </small>
-                      <div class="invalid-feedback">
-                        {{ form.sn.errors }}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-12 col-md-3">
+                  <div class="col-12 col-md-4">
                     <div class="form-group">
                       <label for="id_{{ form.cate.name }}">*類別：</label>
                       {{ form.cate }}
@@ -74,9 +36,17 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-6 col-md-3">
+                  <div class="col-12 col-md-4">
                     <div class="form-group">
-                      <label for="id_{{ form.specmain.name }}">*主規格：</label>
+                      <label for="id_{{ form.mfg.name }}">*廠商：</label>
+                      {{ form.mfg }}
+                      <div class="invalid-feedback">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="form-group">
+                      <label for="id_{{ form.specmain.name }}">*規格編號：</label>
                       {{ form.specmain }}
                       <small id="nameHelpBlock" class="form-text text-muted">
                         輸入主規格。
@@ -86,12 +56,15 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-6 col-md-6">
+                  <div class="col-12 col-md-12">
                     <div class="form-group">
-                      <label for="id_{{ form.specsub.name }}">副規格：</label>
-                      {{ form.specsub }}
+                      <label for="id_{{ form.name.name }}">*品項名稱：</label>
+                      {{ form.name }}
+                      <small id="fullnameHelpBlock" class="form-text text-muted">
+                        輸入品項完整名稱。
+                      </small>
                       <div class="invalid-feedback">
-                        {{ form.specsub.errors }}
+                        {{ form.name.errors }}
                       </div>
                     </div>
                   </div>

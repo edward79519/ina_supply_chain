@@ -59,13 +59,13 @@ class UpdateCompForm(forms.ModelForm):
 class AddItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        exclude = ['is_inquiry', 'is_open', 'is_new']
+        exclude = ['is_inquiry', 'is_open']
         widgets = {
-            'sn': forms.TextInput(attrs={'class': 'form-control', 'disabled': True}),
-            'name': forms.TextInput(attrs={'class': 'form-control', 'disabled': True}),
-            'cate': forms.Select(attrs={'class': 'form-control', 'disabled': True}),
-            'specmain': forms.TextInput(attrs={'class': 'form-control', 'disabled': True}),
-            'specsub': forms.TextInput(attrs={'class': 'form-control', 'disabled': True}),
+            'sn': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'cate': forms.Select(attrs={'class': 'form-control'}),
+            'mfg': forms.Select(attrs={'class': 'form-control'}),
+            'specmain': forms.TextInput(attrs={'class': 'form-control'}),
             'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
 
@@ -76,14 +76,13 @@ class UpdateItemForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'sn': forms.TextInput(attrs={'class': 'form-control', 'disabled': True}),
-            'name': forms.TextInput(attrs={'class': 'form-control', 'disabled': True}),
-            'cate': forms.Select(attrs={'class': 'form-control', 'disabled': True}),
-            'specmain': forms.TextInput(attrs={'class': 'form-control', 'disabled': True}),
-            'specsub': forms.TextInput(attrs={'class': 'form-control', 'disabled': True}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'cate': forms.Select(attrs={'class': 'form-control'}),
+            'mfg': forms.Select(attrs={'class': 'form-control'}),
+            'specmain': forms.TextInput(attrs={'class': 'form-control'}),
             'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'is_open': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
             'is_inquiry': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
-            'is_new': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
         }
 
 
