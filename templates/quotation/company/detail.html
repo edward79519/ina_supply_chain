@@ -38,6 +38,7 @@
   <section id="basic" class="py-3">
     <div class="container py-3">
       <h1 class="my-3">{{ comp.fullname }} - 詳細資料</h1>
+      <div class="text-right">新增日期：{{ comp.addtime|date:"Y-m-d h:i:s a" }} by {{ comp.author }}</div>
       <a role="button" class="btn btn-primary" href="{% url 'Comp_Index' %}">回廠商列表</a>
       <a role="button" class="btn btn-danger" href="{% url 'Comp_Update' comp.id %}">編輯</a>
       <div class="row">
