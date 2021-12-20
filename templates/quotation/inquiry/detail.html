@@ -23,6 +23,7 @@
     <div class="container py-3">
       <h1 class="my-3">詢價單：{{ inquiry.sn }} - 詳細資料</h1>
       <div class="text-right">新增日期：{{ inquiry.addtime|date:"Y-m-d h:i:s a" }} by {{ inquiry.author }}</div>
+      <div class="text-right">上次修改日期：{{ inquiry.history.latest.history_date|date:"Y-m-d h:i:s a" }} by {{ inquiry.history.latest.history_user }}</div>
       <a role="button" class="btn btn-primary" href="{% url 'Inquiry_List' %}">回詢價單列表</a>
       <a role="button" class="btn btn-secondary" href="{% url 'Inquiry_Eptxls' inquiry.id %}">匯出詢價單</a>
       {% if inquiry.status == "詢價中" %}

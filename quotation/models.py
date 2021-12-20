@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from simple_history.models import HistoricalRecords
 
 # Create your models here.
 
@@ -8,6 +9,7 @@ class ModelBase(models.Model):
     addtime = models.DateTimeField(auto_now_add=True)
     updatetime = models.DateTimeField(auto_now=True)
     is_open = models.BooleanField(default=True)
+    history = HistoricalRecords(inherit=True)
 
     class Meta:
         abstract = True
@@ -29,6 +31,7 @@ class Company(ModelBase):
         related_name='companies',
     )
 
+
     def __str__(self):
         return "{}_{}_{}".format(self.sn, self.shortname, self.spnsr)
 
@@ -36,6 +39,7 @@ class Company(ModelBase):
 class Category(models.Model):
     sn = models.CharField(max_length=1, unique=True)
     name = models.CharField(max_length=20)
+    history = HistoricalRecords()
 
     def __str__(self):
         return "{}_{}".format(self.sn, self.name)
@@ -130,6 +134,7 @@ class Inquiry(ModelBase):
 class Current(models.Model):
     code = models.CharField(max_length=4)
     name = models.CharField(max_length=10)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name

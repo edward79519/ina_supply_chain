@@ -83,6 +83,7 @@
     <div class="container py-3">
       <h1 class="my-3">{{ item.sn }}_{{ item.name }} - 詳細資料</h1>
       <div class="text-right">新增日期：{{ item.addtime|date:"Y-m-d h:i:s a" }} by {{ item.author }}</div>
+      <div class="text-right">上次修改日期：{{ item.history.latest.history_date|date:"Y-m-d h:i:s a" }} by {{ item.history.latest.history_user }}</div>
       <a role="button" class="btn btn-primary" href="{% url 'Item_Lsit' %}">回品項列表</a>
       <a role="button" class="btn btn-danger" href="{% url 'Item_Update' item.id %}">編輯</a>
       <div class="row">
