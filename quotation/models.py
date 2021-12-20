@@ -37,9 +37,23 @@ class Company(ModelBase):
 
 
 class Category(models.Model):
-    sn = models.CharField(max_length=1, unique=True)
+    sn = models.CharField(max_length=2, unique=True)
     name = models.CharField(max_length=20)
     history = HistoricalRecords()
+
+    def __str__(self):
+        return "{}_{}".format(self.sn, self.name)
+
+
+class Manufacturer(ModelBase):
+    sn = models.CharField(max_length=4, unique=True)
+    name = models.CharField(max_length=50)
+    fullname = models.CharField(max_length=50, null=True, blank=True)
+    cate = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        related_name='manufacturer',
+    )
 
     def __str__(self):
         return "{}_{}".format(self.sn, self.name)
