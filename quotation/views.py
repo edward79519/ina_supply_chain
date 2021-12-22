@@ -233,12 +233,14 @@ def inquiry_export(request, inqry_id):
     if quotas_old.count() != 0:
         for quota in quotas_old:
             data['quotas'].append({
+                'item_sn': quota.itemsn.sn,
                 'item_name': quota.itemsn.name,
+                'item_mfg': quota.itemsn.mfg.name,
                 'item_spec': quota.itemsn.specmain,
             })
     file_name = export.to_excel(data)
     file_date = file_name.split("_")[3][0:6]
-    [ fyear, fmon ] = [file_date[0:4], file_date[4:6]]
+    [fyear, fmon] = [file_date[0:4], file_date[4:6]]
     print(fyear, fmon)
     return HttpResponseRedirect("/static/files/inquiry/output/{}/{}/{}".format(fyear, fmon, file_name))
 

@@ -46,7 +46,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 def to_excel(data):
-    wb_filedir = os.path.join(BASE_DIR, 'quotation', 'files', 'inquiry_example.xlsx')
+    wb_filedir = os.path.join(BASE_DIR, 'quotation', 'files', 'inquiry_example_2.xlsx')
     wb = load_workbook(wb_filedir)
     ws = wb['詢價單']
 
@@ -74,21 +74,20 @@ def to_excel(data):
     # 資料大於10筆時，將既有品項向下移
     if data_cnt > 10:
         row_shift = data_cnt - 10
-        ws.unmerge_cells(start_row=19, start_column=1, end_row=19, end_column=7)
-        ws.move_range('A19:G30', rows=row_shift, translate=False)
-        ws.merge_cells('A{0}:G{0}'.format(19 + row_shift))
+        ws.unmerge_cells(start_row=19, start_column=1, end_row=19, end_column=8)
+        ws.move_range('A19:H30', rows=row_shift, translate=False)
+        ws.merge_cells('A{0}:H{0}'.format(19 + row_shift))
         row_h = ws.row_dimensions[7].height
         ws.row_dimensions[19 + row_shift].height = row_h
 
 
     # 詢價品項填入表格內
-    maxl_b = 0
     maxl_c = 0
     for idx, row in enumerate(data['quotas'], start=0):
         rowcnt = 9 + idx
 
         # 複製上一列表格格式
-        for colcnt in range(7):
+        for colcnt in range(8):
             from_style = ws.cell(row=rowcnt - 1, column=colcnt + 1)._style
             ws.cell(row=rowcnt, column=colcnt + 1)._style = from_style
             ws.cell(row=rowcnt, column=colcnt + 1).number_format = ws.cell(row=rowcnt - 1,
@@ -97,32 +96,27 @@ def to_excel(data):
         ws.cell(row=rowcnt, column=1, value=idx + 1)
 
         # 填入資料
-        ws.cell(row=rowcnt, column=2, value=row['item_name'])
-        ws.cell(row=rowcnt, column=3, value=row['item_spec'])
+        ws.cell(row=rowcnt, column=2, value=row['item_sn'])
+        ws.cell(row=rowcnt, column=3, value=row['item_name'])
+        ws.cell(row=rowcnt, column=4, value=row['item_mfg'])
 
         # 紀錄欄寬，待調整成最適大小
-        len_b = len(str(ws.cell(row=rowcnt, column=2).value))
         len_c = len(str(ws.cell(row=rowcnt, column=3).value))
-        if len_b > maxl_b:
-            maxl_b = len_b
+
         if len_c > maxl_c:
             maxl_c = len_c
 
-        ws.cell(row=rowcnt, column=4, value=1)  # 填入數量1
-        data_val.add(ws['E{}'.format(rowcnt)])
+        ws.cell(row=rowcnt, column=5, value=1)  # 填入數量1
+        data_val.add(ws['F{}'.format(rowcnt)])  # 設定幣別為選項
 
-        ws.cell(row=rowcnt, column=5).protection = Protection(locked=False)  # 解鎖可填寫區域
-        print(ws.cell(row=rowcnt, column=5), ws.cell(row=rowcnt, column=5).protection)
         ws.cell(row=rowcnt, column=6).protection = Protection(locked=False)  # 解鎖可填寫區域
         print(ws.cell(row=rowcnt, column=6), ws.cell(row=rowcnt, column=5).protection)
-        ws.cell(row=rowcnt, column=7).value = "=D{}*F{}".format(rowcnt, rowcnt)
-
+        ws.cell(row=rowcnt, column=7).protection = Protection(locked=False)  # 解鎖可填寫區域
+        print(ws.cell(row=rowcnt, column=7), ws.cell(row=rowcnt, column=5).protection)
+        ws.cell(row=rowcnt, column=8).value = "=E{}*G{}".format(rowcnt, rowcnt)
 
     # 調整欄寬
-    ws.column_dimensions['B'].width = maxl_b * 1.5
-    ws.column_dimensions['C'].width = maxl_c * 1.5
-    # 設定幣別欄位只能用選項
-    #data_val.add('E21:E30')
+    ws.column_dimensions['C'].width = maxl_c * 1.7
 
     # 設定新增品項區塊範圍
     new_cell_area = 'B21:G30'
@@ -130,25 +124,27 @@ def to_excel(data):
     # bj6
     if data_cnt > 10:
         row_shift = data_cnt - 10
-        new_cell_area = 'B{}:G{}'.format(21+row_shift, 30+row_shift)
+        new_cell_area = 'B{}:H{}'.format(21+row_shift, 30+row_shift)
 
     # 新增品項區塊
     for row in ws[new_cell_area]:
         for idx, col in enumerate(row, start=1):
             col.protection = Protection(locked=False)
             # 數量固定1
-            if idx == 3:
-                col.value = '=IF(B{}="","",1)'.format(col.row)
+            if idx == 4:
+                col.value = '=IF(C{}="","",1)'.format(col.row)
                 col.protection = Protection(locked=True)
-
-            elif idx == 4:
+            # 設定匯率為選項
+            elif idx == 5:
                 data_val.add(col)
             # 總價加公式
-            elif idx == 6:
-                col.value = '=IF(F{0}="","",D{0}*F{0})'.format(col.row)
+            elif idx == 7:
+                col.value = '=IF(G{0}="","",E{0}*G{0})'.format(col.row)
                 col.protection = Protection(locked=True)
+    # 擷取當天時間的年月
     [year, month] = dt.datetime.now().strftime('%Y-%m').split('-')
 
+    # 建立年月資料夾
     file_path = os.path.join(BASE_DIR, 'static', 'files', 'inquiry', 'output', year, month)
     if not os.path.exists(file_path):
         os.makedirs(file_path)
