@@ -38,7 +38,7 @@
                   </div>
                   <div class="col-12 col-md-4">
                     <div class="form-group">
-                      <label for="id_{{ form.mfg.name }}">*廠商：</label>
+                      <label for="id_{{ form.mfg.name }}">*製造商：</label>
                       {{ form.mfg }}
                       <div class="invalid-feedback">
                       </div>
@@ -90,4 +90,26 @@
       </div>
     </div>
   </section>
+  <script>
+    $(document).ready(function() {
+        $(document).on('change', '#id_cate', function (){
+            let cate_id = $('#id_cate :selected').val();
+            $.ajax({
+                url: '/quotation/ajax/mfglist/',
+                method: "GET",
+                data: {
+                    cate_id: cate_id,
+                },
+                success: function (res){
+                    $('#id_mfg').empty();
+                    $("#id_mfg").append($("<option value>").text("---------"));
+                    for (const i in res.mfgs){
+                        let option = $("<option>").val(res.mfgs[i].id).text(res.mfgs[i].id_name);
+                        $("#id_mfg").append(option);
+                    }
+                },
+            });
+        });
+    });
+  </script>
 {% endblock %}

@@ -6,7 +6,11 @@
     <div class="container">
       <div class="row">
         <div class="col-12">
-            <h1 class="my-5">更新報價</h1>
+            <h1 class="my-3">更新報價</h1>
+        </div>
+        <div class="col-12 my-3">
+          <div class="text-right"><small>新增日期：{{ quota.addtime|date:"Y-m-d h:i:s a" }} by {{ quota.history.first.history_user }}</small></div>
+          <div class="text-right"><small>上次修改日期：{{ quota.history.latest.history_date|date:"Y-m-d h:i:s a" }} by {{ quota.history.latest.history_user }}</small></div>
         </div>
       </div>
     </div>
@@ -19,10 +23,13 @@
         <div class="col-9 font-weight-bold">{{ quota.itemsn.sn }}</div>
         <div class="col-3">品項：</div>
         <div class="col-9 font-weight-bold">{{ quota.itemsn.name }}</div>
-        <div class="col-3">規格1：</div>
+        <div class="col-3">類別：</div>
+        <div class="col-9 font-weight-bold">{{ quota.itemsn.cate }}</div>
+        <div class="col-3">製造商：</div>
+        <div class="col-9 font-weight-bold">{{ quota.itemsn.mfg }}</div>
+        <div class="col-3">規格：</div>
         <div class="col-9 font-weight-bold">{{ quota.itemsn.specmain }}</div>
-        <div class="col-3">規格2：</div>
-        <div class="col-9 font-weight-bold">{{ quota.itemsn.specsub }}</div>
+
       </div>
       <form method="POST" class="needs-validation" onsubmit="" novalidate>
         <div class="form-row">

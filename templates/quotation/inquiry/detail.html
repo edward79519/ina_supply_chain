@@ -8,10 +8,10 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script>
       var optionsold = {
-        valueNames: [ 'id', 'sn', 'name', 'specmain', 'specsub', 'price', 'date' ],
+        valueNames: [ 'id', 'sn', 'name', 'manufacturer', 'specmain', 'price', 'date' ],
       };
       var optionsnew = {
-        valueNames: [ 'id', 'sn', 'name', 'specmain', 'specsub', 'price', 'date' ],
+        valueNames: [ 'id', 'sn', 'name', 'manufacturer', 'specmain', 'price', 'date' ],
       };
       /*table = id of the div */
       var userList = new List('tableold', optionsold);
@@ -96,8 +96,8 @@
                   <th scope="col" class="sort fit" data-sort="id">項次</th>
                   <th scope="col" class="sort fit" data-sort="sn">料號</th>
                   <th scope="col" class="sort text-center" data-sort="name">品項</th>
-                  <th scope="col" class="sort text-center" data-sort="specmain">規格1</th>
-                  <th scope="col" class="sort text-center fit" data-sort="specsub">規格2</th>
+                  <th scope="col" class="sort text-center fit" data-sort="manufacturer">廠牌</th>
+                  <th scope="col" class="sort text-center" data-sort="specmain">規格</th>
                   <th scope="col" class="text-center fit">數量</th>
                   <th scope="col" class="sort text-center fit" data-sort="price">價格(新台幣)</th>
                   <th scope="col" class="sort text-center fit" data-sort="date">報價日期</th>
@@ -110,8 +110,8 @@
                   <td class="id text-center">{{ forloop.counter }}</td>
                   <td class="sn"><a href="{% url 'Item_Detail' quota.itemsn.id %}">{{ quota.itemsn.sn }}</a></td>
                   <td class="name text-center">{{ quota.itemsn.name }}</td>
+                  <td class="manufacturer text-center">{{ quota.itemsn.mfg }}</td>
                   <td class="specmain text-center">{{ quota.itemsn.specmain }}</td>
-                  <td class="specsub text-center">{{ quota.itemsn.specsub|default_if_none:"" }}</td>
                   <td class="author text-center">{{ quota.count }}</td>
                   <td class="price text-center">
                     {% if quota.ntd_price %}
@@ -157,8 +157,8 @@
                   <th scope="col" class="sort fit" data-sort="id">項次</th>
                   <th scope="col" class="sort fit" data-sort="sn">料號</th>
                   <th scope="col" class="sort text-center" data-sort="name">品項</th>
-                  <th scope="col" class="sort text-center" data-sort="specmain">規格1</th>
-                  <th scope="col" class="sort text-center fit" data-sort="specsub">規格2</th>
+                  <th scope="col" class="sort text-center fit" data-sort="manufacturer">廠牌</th>
+                  <th scope="col" class="sort text-center" data-sort="specmain">規格</th>
                   <th scope="col" class="text-center fit">數量</th>
                   <th scope="col" class="sort text-center fit" data-sort="price">價格(新台幣)</th>
                   <th scope="col" class="sort text-center fit" data-sort="date">報價日期</th>
@@ -171,13 +171,13 @@
                   <td class="id text-center">{{ forloop.counter }}</td>
                   <td class="sn"><a href="{% url 'Item_Detail' quota.itemsn.id %}">{{ quota.itemsn.sn }}</a></td>
                   <td class="name text-center">{{ quota.itemsn.name }}</td>
+                  <td class="manufacturer text-center">{{ quota.itemsn.mfg }}</td>
                   <td class="specmain text-center">{{ quota.itemsn.specmain }}</td>
-                  <td class="specsub text-center">{{ quota.itemsn.specsub|default_if_none:"" }}</td>
                   <td class="author text-center">{{ quota.count }}</td>
                   <td class="price text-center">
                     {% if quota.ntd_price %}
-                      {{ quota.crnt.code }}{{ quota.price|floatformat:"2g" }}
-                      <br>{% if quota.crnt.code != "TWD"%}( {{ quota.ntd_price.price|floatformat:"2g" }}){% endif %}
+                      {{ quota.crnt.code }} {{ quota.price|floatformat:"2g" }}
+                      {% if quota.crnt.code != "TWD"%}<br>({{ quota.ntd_price|floatformat:"2g" }}){% endif %}
                     {% endif %}
                   </td>
                   <td class="date text-center">{{ quota.qdate|date:"Y-m-d" }}</td>

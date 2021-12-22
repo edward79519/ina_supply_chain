@@ -162,8 +162,8 @@
                   <th scope="col" class="sort fit" data-sort="id">項次</th>
                   <th scope="col" class="sort fit" data-sort="sn">料號</th>
                   <th scope="col" class="sort text-center" data-sort="name">品項</th>
-                  <th scope="col" class="sort text-center" data-sort="specmain">規格1</th>
-                  <th scope="col" class="sort text-center fit" data-sort="specsub">規格2</th>
+                  <th scope="col" class="sort text-center" data-sort="manufacturer">製造商</th>
+                  <th scope="col" class="sort text-center" data-sort="specmain">規格</th>
                   <th scope="col" class="text-center fit">數量</th>
                   <th scope="col" class="sort text-center fit" data-sort="price">價格(新台幣)</th>
                   <th scope="col" class="sort text-center fit" data-sort="date">報價日期</th>
@@ -175,8 +175,8 @@
                   <td class="id text-center">{{ forloop.counter }}</td>
                   <td class="sn">{{ quota.itemsn.sn }}</td>
                   <td class="name text-center">{{ quota.itemsn.name }}</td>
+                  <td class="manufaturer text-center">{{ quota.itemsn.name }}</td>
                   <td class="specmain text-center">{{ quota.itemsn.specmain }}</td>
-                  <td class="specsub text-center">{{ quota.itemsn.specsub|default_if_none:"" }}</td>
                   <td class="author text-center">{{ quota.count }}</td>
                   <td class="price text-center">
                     {% if quota.ntd_price %}

@@ -65,7 +65,7 @@ class AddItemForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'cate': forms.Select(attrs={'class': 'form-control'}),
             'mfg': forms.Select(attrs={'class': 'form-control'}),
-            'specmain': forms.TextInput(attrs={'class': 'form-control'}),
+            'specmain': forms.TextInput(attrs={'class': 'form-control', 'pattern': '^[0-9A-Z]{5,8}'}),
             'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
 
@@ -73,13 +73,9 @@ class AddItemForm(forms.ModelForm):
 class UpdateItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = '__all__'
+        fields = ['name', 'remark', 'is_open', 'is_inquiry']
         widgets = {
-            'sn': forms.TextInput(attrs={'class': 'form-control', 'disabled': True}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'cate': forms.Select(attrs={'class': 'form-control'}),
-            'mfg': forms.Select(attrs={'class': 'form-control'}),
-            'specmain': forms.TextInput(attrs={'class': 'form-control'}),
             'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'is_open': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
             'is_inquiry': forms.CheckboxInput(attrs={'class': 'custom-control-input'}),
@@ -112,5 +108,5 @@ class UpdateQuotaForm(forms.ModelForm):
                 'type': 'date',
                 'max': timezone.now().strftime("%Y-%m-%d"),
             }),
-            'chgrt': forms.NumberInput(attrs={'class': 'form-control'}),
+            'xchgrt': forms.NumberInput(attrs={'class': 'form-control'}),
         }

@@ -8,7 +8,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script>
       var options = {
-        valueNames: [ 'sn', 'fullname', 'category', 'spec', 'qdate'],
+        valueNames: [ 'sn', 'fullname', 'category', 'spec', 'qdate', 'manufacturer'],
         page: 10,
         pagination: [{
             name: "pagination",
@@ -44,10 +44,9 @@
                 <tr>
                   <th scope="col" class="sort" data-sort="sn">料號</th>
                   <th scope="col" class="sort fit" data-sort="fullname">品名</th>
-                  <th scope="col" class="sort text-center" data-sort="category">分類</th>
-                  <th scope="col" class="sort text-center" data-sort="spec">規格1</th>
-                  <th scope="col" class="fit text-center">規格2</th>
-{#                  <th scope="col" class="text-center">趨勢</th>#}
+                  <th scope="col" class="sort text-center" data-sort="category">類別</th>
+                  <th scope="col" class="sort text-center" data-sort="manufacturer">製造商</th>
+                  <th scope="col" class="sort text-center" data-sort="spec">規格</th>
                   <th scope="col" class="fit sort text-center" data-sort="qdate">最新報價日</th>
                   <th scope="col" class="text-center fit">詢價中</th>
                 </tr>
@@ -58,15 +57,14 @@
                   <td class="sn"><a href="{% url 'Item_Detail' item.id %}">{{ item.sn }}</a></td>
                   <td class="fullname">{{ item.name }}</td>
                   <td class="category text-center">{{ item.cate }}</td>
+                  <td class="manufacturer text-center">{{ item.mfg }}</td>
                   <td class="spec text-center">{{ item.specmain }}</td>
-                  <td class="text-center">{% if item.specsub %}{{ item.specsub }}{% endif %}</td>
-{#                  <td class=""></td>#}
                   <td class="qdate text-center">{% if item.last_quotatime %}{{ item.last_quotatime }}{% endif %}</td>
                   <td class="text-center">{% if item.is_inquiry %}是{% else %}否{% endif %}</td>
                 </tr>
                 {% empty %}
                   <tr>
-                    <td colspan="7" class="text-center"> Empty </td>
+                    <td colspan="7" class="text-center"> 目前尚無任何品項。 </td>
                   </tr>
                 {% endfor %}
               </tbody>

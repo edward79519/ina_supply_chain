@@ -31,7 +31,6 @@ class Company(ModelBase):
         related_name='companies',
     )
 
-
     def __str__(self):
         return "{}_{}_{}".format(self.sn, self.shortname, self.spnsr)
 

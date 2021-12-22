@@ -1,3 +1,5 @@
+import requests
+from django.shortcuts import redirect, render
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .models import Company, Item, Inquiry, ItemQuota, Current, Category, Manufacturer
@@ -103,14 +105,18 @@ def item_detail(request, item_id):
     return HttpResponse(template.render(context, request))
 
 
+# 取得物品序號
+def get_itemsn(cate_id, mfg_id, spec):
+    cate = Category.objects.get(id=cate_id).sn
+    mfg = Manufacturer.objects.get(id=mfg_id).sn
+    return '{}{}{}'.format(cate, mfg, spec.zfill(8))
+
+
 @login_required
 def item_add(request):
     template = loader.get_template("quotation/item/add.html")
     if request.method == "POST":
-        cate = Category.objects.get(id=request.POST['cate']).sn
-        mfg = Manufacturer.objects.get(id=request.POST['mfg']).sn
-        spec = request.POST['specmain'].zfill(8)
-        sn = '{}{}{}'.format(cate, mfg, spec)
+        sn = get_itemsn(cate_id=request.POST['cate'], mfg_id=request.POST['mfg'], spec=request.POST['specmain'])
         new_reqst = request.POST.copy()
         new_reqst['sn'] = sn
         form = AddItemForm(new_reqst)
@@ -118,8 +124,10 @@ def item_add(request):
             form.save()
             return HttpResponseRedirect("../")
         else:
-            print('error')
-            return HttpResponseRedirect("./")
+            context = {
+                'form': form,
+            }
+            return HttpResponse(template.render(context, request))
     else:
         form = AddItemForm()
     context = {
@@ -190,9 +198,8 @@ def inquiry_add(request):
             return HttpResponseRedirect("../")
         else:
             print("error")
-            return HttpResponseRedirect("./")
     else:
-        form = AddInquiryForm(initial={'author': request.user})
+        form = AddInquiryForm()
     context = {
         'form': form,
     }
@@ -252,6 +259,8 @@ def quota_inpageupdate(request, quota_id):
             return HttpResponse(
                 '<script type="text/javascript">window.close();window.opener.location.reload();</script>'
             )
+        else:
+            return redirect('./')
     else:
         form = UpdateQuotaForm(instance=quota)
     context = {
@@ -268,32 +277,48 @@ def quota_newadd(request, inqry_id):
     if request.method == "POST":
 
         #  add new item
-        newitmcnt = Item.objects.filter(sn__startswith="TMP").count()
-        sn = "TMP{}{}".format(timezone.now().date().strftime("%Y%m%d"), str(newitmcnt+1).zfill(3))
+        sn = get_itemsn(cate_id=request.POST['cate'], mfg_id=request.POST['mfg'], spec=request.POST['specmain'])
         newre = request.POST.copy()
         newre['sn'] = sn
-        form = AddItemForm(newre, initial={'cate': inqry.cate.id})
+        form = AddItemForm(newre)
 
-        pass  # add item method
-        newitem = form.save()
+        # add item method
+        if form.is_valid():
+            newitem = form.save()
 
-        pass  # create new itemquota and inqry link
-        quota = ItemQuota(itemsn_id=newitem.id, inquirysn_id=inqry_id, is_new=True)
-        quota.save()
+            # create new itemquota and inqry link
+            quota = ItemQuota(
+                itemsn_id=newitem.id,
+                inquirysn_id=inqry_id,
+                is_new=True,
+            )
+            quota.save()
 
-        # update itemquota
-        crnt = Current.objects.get(id=request.POST['crnt']).code
-        qdate = datetime.strptime(request.POST['qdate'], "%Y-%m-%d")
-        rate_data = getrate(crnt, qdate)
-        newre["xchgrt"] = rate_data['in_rate']
-        qryform = UpdateQuotaForm(newre, instance=quota)
-        qryform.save()
-        return HttpResponse(
-            '<script type="text/javascript">window.close();window.opener.location.reload();</script>'
-        )
+            # update itemquota
+            crnt = Current.objects.get(id=request.POST['crnt']).code
+            qdate = datetime.strptime(request.POST['qdate'], "%Y-%m-%d")
+            rate_data = getrate(crnt, qdate)
+            newre["xchgrt"] = rate_data['in_rate']
+            qryform = UpdateQuotaForm(newre, instance=quota)
+            qryform.save()
+            return HttpResponse(
+                '<script type="text/javascript">window.close();window.opener.location.reload();</script>'
+            )
+        else:
+            context = {
+                'form': form,
+                'qryform': UpdateQuotaForm(request.POST),
+            }
+            return HttpResponse(template.render(context, request))
     else:
-        form = AddItemForm(initial={'cate': inqry.cate.id})
-        qryform = UpdateQuotaForm(initial={'crnt': 1})
+        form = AddItemForm()
+        form.fields['cate'].queryset = Category.objects.filter(id=inqry.cate.id)
+        form.fields['cate'].initial = inqry.cate.id
+        qryform = UpdateQuotaForm(
+            initial={
+                'crnt': 1,
+                'qdate': timezone.now().strftime("%Y-%m-%d"),
+            })
     context = {
         'form': form,
         'qryform': qryform,

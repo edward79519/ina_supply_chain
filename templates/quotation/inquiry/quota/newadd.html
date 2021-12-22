@@ -23,13 +23,10 @@
               {{ form.cate }}
             </div>
           </div>
-          <div class="col-12 col-md-6">
+          <div class="col-12">
             <div class="form-group">
-              <label for="id_{{ form.name.name }}">*品項名稱：</label>
-              {{ form.name }}
-              <small id="fullnameHelpBlock" class="form-text text-muted">
-                輸入品項完整名稱。
-              </small>
+              <label for="id_{{ form.mfg.name }}">*製造商：</label>
+              {{ form.mfg }}
             </div>
           </div>
           <div class="col-12">
@@ -41,10 +38,13 @@
               </small>
             </div>
           </div>
-          <div class="col-12">
+          <div class="col-12 col-md-6">
             <div class="form-group">
-              <label for="id_{{ form.specsub.name }}">副規格：</label>
-              {{ form.specsub }}
+              <label for="id_{{ form.name.name }}">*品項名稱：</label>
+              {{ form.name }}
+              <small id="fullnameHelpBlock" class="form-text text-muted">
+                輸入品項完整名稱。
+              </small>
             </div>
           </div>
           <div class="col-9">
@@ -87,7 +87,23 @@
           window.opener.location.reload();
       };
       $(document).ready(function() {
-          $('#id_specmain, #id_specsub, #id_name').prop('disabled', false);
+          $('#id_cate').prop('disabled', true);
+          let cate_id = $('#id_cate :selected').val();
+            $.ajax({
+                url: '/quotation/ajax/mfglist/',
+                method: "GET",
+                data: {
+                    cate_id: cate_id,
+                },
+                success: function (res){
+                    $('#id_mfg').empty();
+                    $("#id_mfg").append($("<option value>").text("---------"));
+                    for (const i in res.mfgs){
+                        let option = $("<option>").val(res.mfgs[i].id).text(res.mfgs[i].id_name);
+                        $("#id_mfg").append(option);
+                    }
+                },
+            });
           $(document).on('click', '#submit', function () {
               $('select').prop('disabled', false);
           });

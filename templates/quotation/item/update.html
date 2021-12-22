@@ -19,7 +19,6 @@
               {% endfor %}
             {% endif %}
           </div>
-          <div><small class="form-text text-muted">*為必填欄位</small></div>
         </div>
         <div class="col-12">
           <form method="POST" class="needs-validation" onsubmit="" novalidate>
@@ -28,66 +27,43 @@
               <div class="col-12 my-2">{{ form.non_field_errors }}</div>
               <div class="col-12">
                 <div class="row">
-                  <div class="col-12 col-md-6">
+                  <div class="col-12 col-md-3">
                     <div class="form-group">
-                      <label for="id_{{ form.name.name }}">*品項名稱：</label>
-                      {{ form.name }}
-                      <small id="fullnameHelpBlock" class="form-text text-muted">
-                        輸入品項完整名稱。
-                      </small>
-                      <div class="invalid-feedback">
-                        {{ form.name.errors }}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <div class="form-group">
-                      <label for="id_{{ form.sn.name }}">*料號：</label>
-                      {{ form.sn }}
-                      <small id="shortnameHelpBlock" class="form-text text-muted">
-                        輸入料號。
-                      </small>
-                      <div class="invalid-feedback">
-                        {{ form.sn.errors }}
-                      </div>
+                      <label for="id_sn">料號：</label>
+                      <div id="id_sn" class="h4">{{ item.sn }}</div>
                     </div>
                   </div>
                   <div class="col-12 col-md-3">
                     <div class="form-group">
-                      <label for="id_{{ form.cate.name }}">*類別：</label>
-                      {{ form.cate }}
-                      <div class="invalid-feedback">
-                      </div>
+                      <label for="id_cate">類別：</label>
+                      <div id="id_cate" class="h4">{{ item.cate }}</div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <div class="form-group">
+                      <label for="id_mfg">廠商：</label>
+                      <div id="id_mfg" class="h4">{{ item.mfg }}</div>
                     </div>
                   </div>
                   <div class="col-6 col-md-3">
                     <div class="form-group">
-                      <label for="id_{{ form.specmain.name }}">*主規格：</label>
-                      {{ form.specmain }}
-                      <small id="nameHelpBlock" class="form-text text-muted">
-                        輸入主規格。
-                      </small>
-                      <div class="invalid-feedback">
-                        {{ form.specmain.errors }}
-                      </div>
+                      <label for="id_spec">規格：</label>
+                      <div id="id_spec" class="h4">{{ item.specmain }}</div>
                     </div>
                   </div>
-                  <div class="col-6 col-md-6">
+                  <div class="col-12">
                     <div class="form-group">
-                      <label for="id_{{ form.specsub.name }}">副規格：</label>
-                      {{ form.specsub }}
-                      <div class="invalid-feedback">
-                        {{ form.specsub.errors }}
-                      </div>
+                      <label for="id_{{ form.name.name }}">品項名稱：</label>
+                      {{ form.name }}
+                      <small id="nameHelpBlock" class="form-text text-muted">
+                        輸入品項名稱。
+                      </small>
                     </div>
                   </div>
                   <div class="col-12">
                     <div class="form-group">
                       <label for="id_{{ form.remark.name }}">備註：</label>
                       {{ form.remark }}
-                      <div class="invalid-feedback">
-                        {{ form.remark.errors }}
-                      </div>
                     </div>
                   </div>
                   <div class="col-12 mb-3">
@@ -100,12 +76,6 @@
                     <div class="custom-control custom-switch">
                       {{ form.is_inquiry }}
                       <label class="custom-control-label" for="id_{{ form.is_inquiry.name }}">是否詢價？</label>
-                    </div>
-                  </div>
-                  <div class="col-12 mb-3">
-                    <div class="custom-control custom-switch">
-                      {{ form.is_new }}
-                      <label class="custom-control-label" for="id_{{ form.is_new.name }}">是否新詢價？</label>
                     </div>
                   </div>
                 </div>
