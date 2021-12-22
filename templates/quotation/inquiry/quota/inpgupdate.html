@@ -38,18 +38,27 @@
             <div class="form-group">
               <label for="id_{{ form.price.name }}">金額：</label>
               {{ form.price }}
+              <div class="invalid-feedback">
+                請輸入金額！
+              </div>
             </div>
           </div>
           <div class="col-3">
             <div class="form-group">
               <label for="id_{{ form.crnt.name }}">幣別：</label>
               {{ form.crnt }}
+              <div class="invalid-feedback">
+                請選擇幣別！
+              </div>
             </div>
           </div>
           <div class="col-12">
             <div class="form-group">
               <label for="id_{{ form.qdate.name }}">日期：</label>
               {{ form.qdate }}
+              <div class="invalid-feedback">
+                請選擇日期！
+              </div>
             </div>
           </div>
           <button type="submit" class="btn btn-primary">送出</button>
@@ -61,5 +70,8 @@
       window.onbeforeunload = function () {
           window.opener.location.reload();
       };
+      $(document).ready(function() {
+          $('#id_price, #id_crnt, #id_qdate').prop('required', true);
+      });
   </script>
 {% endblock %}

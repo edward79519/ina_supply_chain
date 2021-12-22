@@ -264,6 +264,8 @@ def quota_inpageupdate(request, quota_id):
         else:
             return redirect('./')
     else:
+        if quota.crnt is None:
+            form = UpdateQuotaForm(initial={})
         form = UpdateQuotaForm(instance=quota)
     context = {
         'quota': quota,
@@ -319,7 +321,7 @@ def quota_newadd(request, inqry_id):
         qryform = UpdateQuotaForm(
             initial={
                 'crnt': 1,
-                'qdate': timezone.now().strftime("%Y-%m-%d"),
+                # 'qdate': timezone.now().strftime("%Y-%m-%d"),
             })
     context = {
         'form': form,
