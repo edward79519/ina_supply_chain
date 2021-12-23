@@ -1,11 +1,9 @@
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Alignment, Protection
 from openpyxl.worksheet.datavalidation import DataValidation
 import datetime as dt
 from pathlib import Path
 import os
-from openpyxl.worksheet.cell_range import CellRange
-from copy import copy
 
 data_ex = {
     'inquiryid': '20211202001',
@@ -80,7 +78,6 @@ def to_excel(data):
         row_h = ws.row_dimensions[7].height
         ws.row_dimensions[19 + row_shift].height = row_h
 
-
     # 詢價品項填入表格內
     maxl_c = 0
     for idx, row in enumerate(data['quotas'], start=0):
@@ -124,7 +121,7 @@ def to_excel(data):
     # bj6
     if data_cnt > 10:
         row_shift = data_cnt - 10
-        new_cell_area = 'B{}:H{}'.format(21+row_shift, 30+row_shift)
+        new_cell_area = 'B{}:H{}'.format(21 + row_shift, 30 + row_shift)
 
     # 新增品項區塊
     for row in ws[new_cell_area]:
@@ -151,5 +148,68 @@ def to_excel(data):
     print(file_path)
     file_name = "{}_{}_詢價單{}_{}.xlsx".format(
         data['company'], data['category'], data['inquiryid'], dt.datetime.now().strftime("%Y%m%d%H%M%S"))
+    wb.save(os.path.join(BASE_DIR, file_path, file_name))
+    return file_name
+
+
+test_data = {
+    'item_sn': 'PVAESDDDDD',
+    'item_name': 'ITEM_History',
+    'data': [{
+        'item_sn': 'AAA',
+        'item_name': 'ABDC',
+        'item_mfg': 'DDD',
+        'item_spec': 'AXDF',
+        'cnt': 1,
+        'price': 10210,
+        'crnt': 'TWD',
+        'xchgrt': 1.000,
+        'TWD_price': 10210,
+        'qdate': '2021-12-01',
+    }, {
+        'item_sn': 'CCC',
+        'item_name': 'SXS',
+        'item_mfg': 'SSS',
+        'item_spec': 'ASD',
+        'cnt': 1,
+        'price': 10,
+        'crnt': 'USD',
+        'xchgrt': 30.000,
+        'TWD_price': 30.000,
+        'qdate': '2021-12-02',
+    }, ],
+}
+
+
+def item_to_excel(data):
+    # 開啟新的excel
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Data'
+
+    # 標題欄位
+    col_names = ['料號', '品項名稱', '類別', '製造商', '品項規格', '數量', '價格(原幣別)',
+                 '幣別', '匯率', '價格(台幣)', '報價日期']
+    for idx, col in enumerate(col_names, start=1):
+        ws.cell(row=1, column=idx, value=col)
+
+    # 寫入資料
+    if len(data['data']) != 0:  # 如有資料才寫入
+        for rowcnt, row in enumerate(data['data'], start=2):
+            for colcnt, key in enumerate(row, start=1):
+                ws.cell(row=rowcnt, column=colcnt, value=row[key])
+
+    # 擷取當天時間的年月
+    [year, month] = dt.datetime.now().strftime('%Y-%m').split('-')
+
+    # 建立年月資料夾
+    file_path = os.path.join(BASE_DIR, 'static', 'files', 'itemhistory', 'output', year, month)
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
+
+    # 建立檔案名稱
+    file_name = "{}{}_歷史報價_{}.xlsx".format(data['item_sn'], data['item_name'], dt.datetime.now().strftime("%Y%m%d%H%M%S"))
+
+    # 存檔
     wb.save(os.path.join(BASE_DIR, file_path, file_name))
     return file_name

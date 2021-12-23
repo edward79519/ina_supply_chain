@@ -105,6 +105,39 @@ def item_detail(request, item_id):
     return HttpResponse(template.render(context, request))
 
 
+# 歷史報價匯出
+def item_hstr_export(request, item_id):
+    item = Item.objects.get(id=item_id)
+    quotas = ItemQuota.objects.filter(itemsn_id=item_id).order_by("-qdate")
+    quotas_data = {
+        'item_sn': item.sn,
+        'item_name': item.name,
+        'data': [],
+    }
+    # 製作資料
+    if quotas.count() != 0:
+        for quota in quotas:
+            if quota.price:
+                quotas_data['data'].append({
+                    'item_sn': item.sn,
+                    'item_name': item.name,
+                    'item_cate': item.cate.name,
+                    'item_mfg': item.mfg.name,
+                    'item_spec': item.specmain,
+                    'cnt': quota.count,
+                    'price': quota.price,
+                    'crnt': quota.crnt.code,
+                    'xchgrt': quota.xchgrt,
+                    'TWD_price': quota.ntd_price(),
+                    'qdate': quota.qdate,
+                })
+    file_name = export.item_to_excel(quotas_data)
+    file_date = file_name.split("_")[2][0:6]
+    [fyear, fmon] = [file_date[0:4], file_date[4:6]]
+    print(fyear, fmon)
+    return HttpResponseRedirect("/static/files/itemhistory/output/{}/{}/{}".format(fyear, fmon, file_name))
+
+
 # 取得物品序號
 def get_itemsn(cate_id, mfg_id, spec):
     cate = Category.objects.get(id=cate_id).sn
@@ -243,7 +276,6 @@ def inquiry_export(request, inqry_id):
     [fyear, fmon] = [file_date[0:4], file_date[4:6]]
     print(fyear, fmon)
     return HttpResponseRedirect("/static/files/inquiry/output/{}/{}/{}".format(fyear, fmon, file_name))
-
 
 @login_required
 def quota_inpageupdate(request, quota_id):
