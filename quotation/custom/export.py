@@ -116,7 +116,7 @@ def to_excel(data):
     ws.column_dimensions['C'].width = maxl_c * 1.7
 
     # 設定新增品項區塊範圍
-    new_cell_area = 'B21:G30'
+    new_cell_area = 'B21:H30'
 
     # bj6
     if data_cnt > 10:
