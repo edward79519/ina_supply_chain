@@ -1,0 +1,181 @@
+{% extends 'frame/nonavbase.html' %}
+{% load tz %}
+{% block title %}Inaenergy{% endblock %}
+{% block content %}
+  <section id="title">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+            <h1 class="my-5">上傳資料確認：</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="result">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div id="msg" class="text-danger"></div>
+          <div class="text-danger">
+
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="row my-3">
+            <div class="col-6">
+              <h6>單號：</h6>
+              <h5 class="font-weight-bold">{{ inqry.sn }}</h5>
+            </div>
+            <div class="col-6">
+              <h6>詢價類別：</h6>
+              <h5 class="font-weight-bold">{{ inqry.cate }}</h5>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col-3">
+              <label for="alldate">統一填入日期：</label>
+              <input type="date" id="alldate" max="{% now "Y-m-d" %}" class="form-control">
+            </div>
+            <div class="col-3 d-flex align-items-end">
+              <input type="button" value="送出" class="btn btn-primary" id="date-btn">
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+{#          {{ data.quota_time }}#}
+{#          {{ data.quota_old }}#}
+{#          {{ data.quota_new }}#}
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            {{ quotaformset.management_form }}
+            {{ newquotaformset.management_form }}
+            <h4 class="font-weight-bold">既有品項</h4>
+            <table class="table table-hover" id="oldtable">
+              <tr>
+                <th></th>
+                <th>料號</th>
+                <th>品名</th>
+                <th>製造商</th>
+                <th>幣別</th>
+                <th>價格</th>
+                <th>報價日</th>
+                <th>刪除</th>
+              </tr>
+              {% for form in quotaformset %}
+                <tr>
+                {% for field in form %}
+                  <td>
+                    {% if "inquiry" in field.name %}
+                      <p>{{forloop.parentloop.counter}}{{ field }}</p>
+                    {% else %}
+                      <p>{{ field }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                      <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                  </td>
+                {% endfor %}
+                  <td><input type="button" class="btn btn-sm btn-danger delbox" value="刪除"></td>
+                </tr>
+              {% endfor %}
+            </table>
+            <h4 class="font-weight-bold">新增品項</h4>
+            <div id="newtable">
+              {% for form in newquotaformset %}
+                <div class="form-row">
+                {% for field in form %}
+                  {% if forloop.counter == 1 %}
+                    <div class="col-12">
+                      <h5>{{forloop.parentloop.counter}}. {{ field }}</h5>
+                      <div class="text-danger">
+                        {% if form.non_field_errors %}
+                          {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger">
+                              <strong>{{ error|escape }}</strong>
+                            </div>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                  {% elif forloop.counter <= 3 %}
+                    <div class="col-3 d-none">
+                      {{ field }}
+                  {% else %}
+                    <div class="col-3">
+                      {{ field.label_tag }}
+                      {{ field }}
+                  {% endif %}
+                      {% for error in field.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                      {% endfor %}
+                      <div class="invalid-feedback">
+                        請輸入。
+                      </div>
+                    </div>
+                {% endfor %}
+                  <div class="col-3 d-flex align-items-center justify-content-end" >
+                    <input type="button" class="btn btn-danger delbox" value="刪除">
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            <input type="submit" value="送出" class="btn btn-primary my-5">
+        </form>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    $(document).on('click', '#date-btn',function () {
+        var qdate = $('#alldate').val();
+        $('input[type="date"]').val(qdate)
+    });
+    $('#oldtable').on('click', '.delbox', function (){
+        $(this).closest("tr").remove();
+        var rowCount = $('#oldtable tr').length;
+        $('#id_oldquota-TOTAL_FORMS').val(rowCount-1)
+    });
+    $('#newtable').on('click', '.delbox', function (){
+        $(this).parent().parent().remove();
+        var rowCount = $('div .form-row').length;
+        $('#id_newquota-TOTAL_FORMS').val(rowCount)
+    });
+    $(document).ready(function (){
+        $('#newtable input[type!="hidden"]').prop('readonly', false);
+        $('input[name$="item_mfgcode"]').each(function (){
+            let mfg_name = $(this).closest('.form-row').find('[name$="item_mfg"]').val();
+            var $mfgcdfield = $(this)
+            $.ajax({
+              url: '/quotation/ajax/mfgcode/',
+              method: "GET",
+              data: {
+                  mfg_name: mfg_name,
+              },
+              success: function (res){
+                if (res.data.status ==='OK'){
+                  $mfgcdfield.val(res.data.mfg_code);
+                } else {
+                  $mfgcdfield.parent().parent().children('.invalid-feedback').text(res.data.message);
+                }
+              },
+            });
+        });
+        $('#newtable input[name$="item_mfg"]').on('change paste keyup', function (){
+            let mfg_name = $(this).closest('.form-row').find('[name$="item_mfg"]').val();
+            var $mfgcdfield = $(this).closest('.form-row').find('[name$="item_mfgcode"]')
+            $.ajax({
+              url: '/quotation/ajax/mfgcode/',
+              method: "GET",
+              data: {
+                mfg_name: mfg_name,
+              },
+              success: function (res){
+                if ($mfgcdfield.val() === "" || $mfgcdfield.val()!==res.data.mfg_code){
+                  $mfgcdfield.val(res.data.mfg_code);
+                }
+              },
+            });
+        });
+    });
+  </script>
+{% endblock %}

@@ -18,7 +18,10 @@ urlpatterns = [
     path('inquiry/<int:inqry_id>/addnewquota/', views.quota_newadd, name="Quota_Add"),
     path('inquiry/<int:inqry_id>/close/', views.inquiry_close, name="Inquiry_Close"),
     path('inquiry/<int:inqry_id>/exportxls/', views.inquiry_export, name="Inquiry_Eptxls"),
+    path('inquiry/<int:inqry_id>/importxls/', views.inqry_imprtres, name="Inquiry_Imptxls"),
     path('quota/<int:quota_id>/', views.quota_inpageupdate, name="Quota_Inpgupdate"),
+    path('quota/<int:quota_id>/delete/', views.quota_del, name="Quota_Del"),
     path('ajax/itemdetail/', ajax.getdetail, name="Ajax_Getitem"),
     path('ajax/mfglist/', ajax.get_mfg, name="Ajax_GetMFG"),
+    path('ajax/mfgcode/', ajax.get_mfgcode, name="Ajax_GetMFGCode"),
 ]

@@ -1,6 +1,11 @@
 from django import forms
-from .models import Company, Item, Inquiry, ItemQuota
+from django.core.exceptions import ValidationError
+
+from .models import Company, Item, Inquiry, ItemQuota, Current, Manufacturer
 from django.utils import timezone
+from .validator import FileValidator, ItemSnValidator
+from django.utils.translation import gettext_lazy as _
+from .custom.exchange import getrate
 
 
 class AddCompForm(forms.ModelForm):
@@ -110,3 +115,205 @@ class UpdateQuotaForm(forms.ModelForm):
             }),
             'xchgrt': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+
+class XlsUploadForm(forms.Form):
+    source_code_validator = FileValidator(
+        ("xlsx",),
+        ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/zip"),
+        max_size=1 * 1024 * 1024, )
+
+    source_code_file = forms.FileField(
+        required=True,
+        max_length=100,
+        validators=[source_code_validator],
+        label=_("上傳檔案"),
+        help_text=_("副檔名為 .xlsx, 檔名不能超過 100 字元"),
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'required': True,
+            'accept': '.xlsx',
+        })
+    )
+
+
+class Quotaform(forms.Form):
+    # prefix = 'oldquota'
+    itemsn_validator = ItemSnValidator(
+        sn_list=Item.objects.all().values_list('sn', flat=True)
+    )
+    inquiry_id = forms.CharField(
+        required=True,
+        max_length=200,
+        widget=forms.HiddenInput()
+    )
+    item_sn = forms.CharField(
+        required=True,
+        max_length=200,
+        validators=[itemsn_validator],
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'readonly': True,
+            'required': True,
+        })
+    )
+    item_name = forms.CharField(
+        required=True,
+        max_length=100,
+        label=_("品項名稱"),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'readonly': True,
+            'required': True,
+        })
+    )
+    item_mfg = forms.CharField(
+        required=True,
+        max_length=50,
+        label=_("製造商"),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'readonly': True,
+            'required': True,
+        })
+    )
+    quota_crnt = forms.CharField(
+        required=True,
+        max_length=200,
+        label=_("幣別"),
+        widget=forms.Select(
+            choices=Current.objects.all().values_list('name', 'name'),
+            attrs={'class': 'form-control'}
+        )
+    )
+    quota_price = forms.DecimalField(
+        required=True,
+        max_digits=18,
+        decimal_places=4,
+        label=_("單價"),
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'required': True,
+            'min': 0,
+        })
+    )
+    quota_time = forms.DateField(
+        required=True,
+        label=_("報價日期"),
+        widget=forms.DateInput(attrs={
+            'required': True,
+            'class': 'form-control',
+            'type': 'date',
+            'max': timezone.localtime(timezone.now()).strftime("%Y-%m-%d"),
+        })
+    )
+
+    def save(self):
+        data = self.cleaned_data
+        print(data)
+        item = Item.objects.get(sn=data['item_sn'])
+        itemquota = ItemQuota.objects.get(inquirysn_id=data['inquiry_id'], itemsn=item)
+        crnt = Current.objects.get(name__contains=data['quota_crnt'])
+        itemquota.crnt = crnt
+        rate_data = getrate(crnt.code, data['quota_time'])
+        itemquota.xchgrt = rate_data['ex_rate']
+        itemquota.price = data['quota_price']
+        itemquota.qdate = data['quota_time']
+        itemquota.save()
+
+
+class NewQuotaForm(Quotaform):
+    item_sn = None
+    item_cate = forms.CharField(
+        required=True,
+        max_length=10,
+        label=_("品項分類"),
+        widget=forms.HiddenInput()
+    )
+    user_id = forms.CharField(
+        required=True,
+        max_length=10,
+        widget=forms.HiddenInput()
+    )
+    item_spec = forms.CharField(
+        required=True,
+        max_length=100,
+        label=_("規格"),
+        widget=forms.TextInput(attrs={
+            'required': True,
+            'class': 'form-control',
+            'pattern': '^[0-9A-Z]{5,8}'
+        })
+    )
+    item_mfgcode = forms.CharField(
+        required=True,
+        max_length=4,
+        label=_("廠商編號"),
+        widget=forms.TextInput(attrs={
+            'required': True,
+            'class': 'form-control',
+            'pattern': '^[0-9A-Z]{2}',
+        })
+    )
+
+    field_order = ['inquiry_id', 'item_cate', 'user_id', 'item_mfg', 'item_mfgcode', 'item_spec',
+                   'item_name', 'quota_crnt', 'quota_price', 'quota_time']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        item_mfg = self.cleaned_data.get('item_mfg')
+        item_mfgcode = self.cleaned_data.get('item_mfgcode')
+        item_cate = self.cleaned_data.get('item_cate')
+        item_spec = self.cleaned_data.get('item_spec')
+        mfgnametocode = list(Manufacturer.objects.filter(name__exact=item_mfg).values_list('sn', flat=True))
+        mfgcodetoname = list(Manufacturer.objects.filter(sn__exact=item_mfgcode).values_list('name', flat=True))
+        speclist = list(Item.objects.filter(cate__id=item_cate, mfg__sn=item_mfgcode).values_list('specmain', flat=True))
+
+        if (item_mfg not in mfgcodetoname) or (item_mfgcode not in mfgnametocode):
+            raise ValidationError(_('製造商名稱與編號不同。'), code='MfgDataMismatch')
+
+        # if item_spec in speclist:
+        #     raise ValidationError(_('規格編號已有。'), code='SpecExist')
+
+    def save(self):
+        data = self.cleaned_data
+        cate_id = data['item_cate']
+        mfg_sn = data['item_mfgcode']
+        mfg_name = data['item_mfg']
+        item_spec = data['item_spec']
+        item_name = data['item_name']
+        inqry_id = data['inquiry_id']
+        user_id = data['user_id']
+        quota_price = data['quota_price']
+        quota_crnt = Current.objects.get(name=data['quota_crnt'])
+        quota_time = data['quota_time']
+        xchg_rate = getrate(quota_crnt.code, quota_time)['ex_rate']
+        item_sn = "{}{}{}".format(cate_id, mfg_sn, item_spec.zfill(8))
+
+        mfg, mfg_created = Manufacturer.objects.get_or_create(
+            cate_id=cate_id,
+            sn=mfg_sn,
+            name=mfg_name,
+        )
+
+        item, item_created = Item.objects.get_or_create(
+            sn=item_sn,
+            name=item_name,
+            cate_id=cate_id,
+            mfg=mfg,
+            specmain=item_spec,
+            author_id=user_id,
+        )
+
+        quota, quota_created = ItemQuota.objects.update_or_create(
+            itemsn=item,
+            inquirysn_id=inqry_id,
+            price=quota_price,
+            crnt=quota_crnt,
+            xchgrt=xchg_rate,
+            qdate=quota_time,
+            is_new=True,
+        )
+        print(mfg, mfg_created)
+        print(item, item_created)
+        print(quota, quota_created)

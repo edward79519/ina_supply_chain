@@ -111,24 +111,24 @@
           $('#id_cate').prop('disabled', true);
           $('#id_price, #id_crnt, #id_qdate').prop('required', true);
           let cate_id = $('#id_cate :selected').val();
-            $.ajax({
-                url: '/quotation/ajax/mfglist/',
-                method: "GET",
-                data: {
-                    cate_id: cate_id,
-                },
-                success: function (res){
-                    $('#id_mfg').empty();
-                    $("#id_mfg").append($("<option value>").text("---------"));
-                    for (const i in res.mfgs){
-                        let option = $("<option>").val(res.mfgs[i].id).text(res.mfgs[i].id_name);
-                        $("#id_mfg").append(option);
-                    }
-                },
-            });
-          $(document).on('click', '#submit', function () {
-              $('select').prop('disabled', false);
+          $.ajax({
+              url: '/quotation/ajax/mfglist/',
+              method: "GET",
+              data: {
+                  cate_id: cate_id,
+              },
+              success: function (res){
+                  $('#id_mfg').empty();
+                  $("#id_mfg").append($("<option value>").text("---------"));
+                  for (const i in res.mfgs){
+                      let option = $("<option>").val(res.mfgs[i].id).text(res.mfgs[i].id_name);
+                      $("#id_mfg").append(option);
+                  }
+              },
           });
+          $(document).on('click', '#submit', function () {
+            $('select').prop('disabled', false);
+        });
       });
   </script>
 {% endblock %}

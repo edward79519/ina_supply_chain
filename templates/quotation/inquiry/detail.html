@@ -27,6 +27,9 @@
       <a role="button" class="btn btn-primary" href="{% url 'Inquiry_List' %}">回詢價單列表</a>
       <a role="button" class="btn btn-secondary" href="{% url 'Inquiry_Eptxls' inquiry.id %}">匯出詢價單</a>
       {% if inquiry.status == "詢價中" %}
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#xlsImport">
+          匯入詢價單
+        </button>
         <a role="button" class="btn btn-danger" href="{% url 'Inquiry_Close' inquiry.id %}">結案</a>
       {% endif %}
       <div class="row">
@@ -123,6 +126,7 @@
                   <td class="text-center">
                     {% if inquiry.status == "詢價中" %}
                       <a class="btn btn-sm btn-primary" onClick="openwindow('{% url "Quota_Inpgupdate" quota.id %}')">更新報價</a>
+                      <a class="btn btn-sm btn-danger" href="{% url 'Quota_Del' quota.id %}">刪除</a>
                     {% endif %}
                   </td>
                 </tr>
@@ -148,7 +152,7 @@
               </div>
               <input type="text" class="fuzzy-search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
               {% if inquiry.status == "詢價中" %}
-                <a role="button" class="btn btn-danger ml-5" onClick="openwindow('{% url "Quota_Add" inquiry.id %}')">新增</a>
+                <a role="button" class="btn btn-primary ml-5" onClick="openwindow('{% url "Quota_Add" inquiry.id %}')">新增</a>
               {% endif %}
             </div>
             <table class="table table-hover">
@@ -184,6 +188,7 @@
                   <td class="text-center">
                     {% if inquiry.status == "詢價中" %}
                       <a class="btn btn-sm btn-primary" onClick="openwindow('{% url "Quota_Inpgupdate" quota.id %}')">更新報價</a>
+                      <a class="btn btn-sm btn-danger" href="{% url 'Quota_Del' quota.id %}">刪除</a>
                     {% endif %}
                   </td>
                 </tr>
@@ -199,9 +204,52 @@
       </div>
     </div>
   </section>
+  <div class="modal fade" id="xlsImport" tabindex="-1" role="dialog" aria-labelledby="xlsImportLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="xlsImportLabel">匯入制式 Excel 檔</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form action="" class="needs-validation" enctype="multipart/form-data" method="post" novalidate>
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="form-group">
+              <div class="custom-file">
+                {{ form.source_code_file }}
+                <label class="custom-file-label" for="id_{{ form.source_code_file.name }}">選擇檔案...</label>
+                <small>{{ form.source_code_file.help_text }}</small>
+                <div class="invalid-feedback">請選擇檔案！</div>
+              </div>
+
+            </div>
+{#            <div class="mb-3">#}
+{#              <label for="id_{{ form.source_code_file.name }}" class="form-label"></label>#}
+{#              {{ form.source_code_file }}#}
+{#            </div>#}
+{#            {{ form }}#}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+            <button type="submit" class="btn btn-primary">上傳檔案</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
   <script>
       function openwindow (url) {
         window.open(url,'','width=560, height=500, location=no, left=50, top=50');
       }
+      $('#id_{{ form.source_code_file.name }}').on('change',function(){
+          //get the file name
+          var fileName = $(this).val();
+          //replace the "Choose a file" label
+          $(this).next('.custom-file-label').html(fileName);
+      })
   </script>
+  <!-- Modal -->
+
 {% endblock %}

@@ -22,3 +22,21 @@ def get_mfg(request):
     return JsonResponse(data)
 
 
+def get_mfgcode(request):
+    mfg_name = request.GET.get('mfg_name')
+    mfg = Manufacturer.objects.filter(name__exact=mfg_name)
+    data = {}
+    if mfg.count() == 0:
+        data['status'] = "Error"
+        data['message'] = "查無資料。"
+    elif mfg.count() == 1:
+        data['status'] = "OK"
+        data['mfg_code'] = mfg[0].sn
+    else:
+        data['status'] = "Error"
+        data['message'] = "查詢超過一筆資料。"
+    rdata = {
+        'data': data,
+    }
+    print(rdata)
+    return JsonResponse(rdata)

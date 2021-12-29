@@ -50,7 +50,7 @@ def to_excel(data):
 
     ws.protection.password = '50791838'
     ws.protection.sheet = True
-    ws['B3'] = data['date']  # 詢價時間
+    ws['B3'] = "{}_{}".format(data['date'], data['inquiryid'])  # 詢價時間
 
     ws['B5'] = "{}\n({})".format(data['author'], data['author_tel'])  # 詢價人 = 詢價單建立人
     ws['B5'].alignment = Alignment(wrap_text=True)  # 換行
@@ -208,8 +208,66 @@ def item_to_excel(data):
         os.makedirs(file_path)
 
     # 建立檔案名稱
-    file_name = "{}{}_歷史報價_{}.xlsx".format(data['item_sn'], data['item_name'], dt.datetime.now().strftime("%Y%m%d%H%M%S"))
+    file_name = "{}{}_歷史報價_{}.xlsx".format(data['item_sn'], data['item_name'],
+                                           dt.datetime.now().strftime("%Y%m%d%H%M%S"))
 
     # 存檔
     wb.save(os.path.join(BASE_DIR, file_path, file_name))
     return file_name
+
+
+def readitem_xlsx(filepath):
+    wb = load_workbook(filepath)
+    ws = wb.active
+    try:
+        quota_time = ws.cell(row=3, column=5).value  # out: datetime
+        print()
+        data = {
+            'status': 'OK',
+            'inquiryid': ws.cell(row=3, column=2).value.split("_")[1],
+            'quota_time': quota_time,
+            'quota_old': [],
+            'quota_new': [],
+        }
+        # 找出新舊資料 row 起點和終點
+        old_start = 0
+        old_end = 0
+        new_start = 0
+        new_end = ws.max_row
+        for i in range(ws.max_row):
+            if ws.cell(row=i + 1, column=1).value == "既有規格":
+                old_start = i + 3
+            elif ws.cell(row=i + 1, column=1).value == "新規格詢價":
+                old_end = i
+                new_start = i + 3
+        print(old_start, old_end, new_start, new_end)
+
+        # 舊資料讀入
+        for row in range(old_start, old_end + 1):
+            if ws.cell(row=row, column=2).value is not None:
+                data['quota_old'].append({
+                    'item_sn': ws.cell(row=row, column=2).value,
+                    'item_name': ws.cell(row=row, column=3).value,
+                    'item_mfg': ws.cell(row=row, column=4).value,
+                    'quota_crnt': ws.cell(row=row, column=6).value,
+                    'quota_price': ws.cell(row=row, column=7).value,
+                })
+
+        # 新資料填入
+        for row in range(new_start, new_end + 1):
+            if ws.cell(row=row, column=3).value is not None:
+                data['quota_new'].append({
+                    'item_sn': "",
+                    'item_name': ws.cell(row=row, column=3).value,
+                    'item_mfg': ws.cell(row=row, column=4).value,
+                    'quota_crnt': ws.cell(row=row, column=6).value,
+                    'quota_price': ws.cell(row=row, column=7).value,
+                })
+        # 移除暫存檔
+        # os.remove(filepath)
+        return data
+    except:
+        data = {
+            'status': 'error'
+        }
+        return data

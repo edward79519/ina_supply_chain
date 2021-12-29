@@ -1,15 +1,19 @@
-import requests
+import os
+
+from django.forms import formset_factory, modelformset_factory
 from django.shortcuts import redirect, render
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+
+from supplyChain.settings import BASE_DIR
 from .models import Company, Item, Inquiry, ItemQuota, Current, Category, Manufacturer
-from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm, AddInquiryForm, UpdateQuotaForm
+from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm, AddInquiryForm, UpdateQuotaForm, \
+    XlsUploadForm, Quotaform, NewQuotaForm
 from django.utils import timezone
 from datetime import datetime
 from .custom.exchange import getrate
 from django.contrib.auth.decorators import login_required
 from .custom import export
-from pathlib import Path, PurePath
 
 # Create your views here.
 
@@ -205,10 +209,29 @@ def inquiry_detail(request, inqry_id):
     quotas_old = ItemQuota.objects.filter(inquirysn_id=inqry_id, is_new=False)
     quotas_new = ItemQuota.objects.filter(inquirysn_id=inqry_id, is_new=True)
     template = loader.get_template("quotation/inquiry/detail.html")
+    if request.method == "POST":
+        uploadform = XlsUploadForm(request.POST, request.FILES)
+        if uploadform.is_valid():  # 這裡會驗證表格內容是否有效
+            # 將檔案存到硬碟中
+            filedir = os.path.join(BASE_DIR, 'static', 'files', 'inquiry', 'import')
+            if not os.path.exists(filedir):
+                os.makedirs(filedir)
+            filename = "TMPXLSUPLOAD_{}.xlsx".format(datetime.now().strftime("%Y%m%d%H%M%S"))
+            filepath = os.path.join(filedir, filename)
+            with open(filepath, "wb") as f:
+                for chunk in uploadform.cleaned_data["source_code_file"].chunks():
+                    f.write(chunk)
+            # data = import_xlsx.read_xlsx(filepath)
+            request.session['filepath'] = filepath
+            print(filepath)
+            return redirect('Inquiry_Imptxls', inqry_id=inqry_id)
+    else:
+        uploadform = XlsUploadForm()
     context = {
         'inquiry': inquiry,
         'quotas_old': quotas_old,
         'quotas_new': quotas_new,
+        'form': uploadform,
     }
     return HttpResponse(template.render(context, request))
 
@@ -221,7 +244,7 @@ def inquiry_add(request):
         sn = "{}{}".format(timezone.now().date().strftime("%Y%m%d"), str(count).zfill(3))
         query = request.POST.copy()
         query['sn'] = sn
-        form = AddInquiryForm(query, initial={'author': request.user})
+        form = AddInquiryForm(query)
         if form.is_valid():
             inqform = form.save()
             cate_id = query['cate']
@@ -232,7 +255,7 @@ def inquiry_add(request):
         else:
             print("error")
     else:
-        form = AddInquiryForm()
+        form = AddInquiryForm(initial={'author': request.user})
     context = {
         'form': form,
     }
@@ -277,6 +300,7 @@ def inquiry_export(request, inqry_id):
     print(fyear, fmon)
     return HttpResponseRedirect("/static/files/inquiry/output/{}/{}/{}".format(fyear, fmon, file_name))
 
+
 @login_required
 def quota_inpageupdate(request, quota_id):
     template = loader.get_template("quotation/inquiry/quota/inpgupdate.html")
@@ -286,7 +310,7 @@ def quota_inpageupdate(request, quota_id):
         qdate = datetime.strptime(request.POST['qdate'], "%Y-%m-%d")
         rate_data = getrate(crnt, qdate)
         quota_data = request.POST.copy()
-        quota_data["xchgrt"] = rate_data['in_rate']
+        quota_data["xchgrt"] = rate_data['ex_rate']
         form = UpdateQuotaForm(quota_data, instance=quota)
         if form.is_valid():
             form.save()
@@ -334,7 +358,7 @@ def quota_newadd(request, inqry_id):
             crnt = Current.objects.get(id=request.POST['crnt']).code
             qdate = datetime.strptime(request.POST['qdate'], "%Y-%m-%d")
             rate_data = getrate(crnt, qdate)
-            newre["xchgrt"] = rate_data['in_rate']
+            newre["xchgrt"] = rate_data['ex_rate']
             qryform = UpdateQuotaForm(newre, instance=quota)
             qryform.save()
             return HttpResponse(
@@ -360,3 +384,71 @@ def quota_newadd(request, inqry_id):
         'qryform': qryform,
     }
     return HttpResponse(template.render(context, request))
+
+
+def inqry_imprtres(request, inqry_id):
+    template = loader.get_template('quotation/inquiry/import/importres.html')
+    inqry = Inquiry.objects.get(id=inqry_id)
+    filepath = request.session.get('filepath')
+    data = export.readitem_xlsx(filepath)
+    if data['status'] == 'error':
+        os.remove(filepath)
+        return HttpResponse("檔案格式錯誤，請返回重新上傳！")
+    if data['inquiryid'] != inqry.sn:
+        os.remove(filepath)
+        return HttpResponse("上傳單號不符，請返回重新上傳！")
+    old_cnt = len(data['quota_old'])
+    new_cnt = len(data['quota_new'])
+    old_prefix = 'oldquota'
+    new_prefix = 'newquota'
+    print(old_cnt)
+    QuotaFormSet = formset_factory(Quotaform, extra=old_cnt)
+    NewQuotaFormSet = formset_factory(NewQuotaForm, extra=new_cnt)
+    if request.method == "POST":
+        formset = QuotaFormSet(request.POST, prefix=old_prefix)
+        newformset = NewQuotaFormSet(request.POST, prefix=new_prefix)
+        print(formset.is_valid(), formset.errors, formset.non_form_errors, sep='\n')
+        print(newformset.is_valid(), newformset.errors, newformset.non_form_errors,  sep='\n')
+        if formset.is_valid() and newformset.is_valid():
+            for form in formset:
+                form.save()
+            for form in newformset:
+                form.save()
+            return redirect('Inquiry_Detail', inqry_id=inqry_id)
+    else:
+        formset_data = {
+            '{}-TOTAL_FORMS'.format(old_prefix): old_cnt,
+            '{}-INITIAL_FORMS'.format(old_prefix): '0',
+            '{}-TOTAL_FORMS'.format(new_prefix): new_cnt,
+            '{}-INITIAL_FORMS'.format(new_prefix): '0',
+        }
+        for idx, rdata in enumerate(data['quota_old'], start=0):
+            for key in rdata:
+                formset_data['{}-{}-{}'.format(old_prefix, idx, key)] = rdata[key]
+            formset_data['{}-{}-inquiry_id'.format(old_prefix, idx)] = inqry_id
+            formset_data['{}-{}-quota_time'.format(old_prefix, idx)] = data['quota_time']
+        for idx, rdata in enumerate(data['quota_new'], start=0):
+            for key in rdata:
+                formset_data['{}-{}-{}'.format(new_prefix, idx, key)] = rdata[key]
+            formset_data['{}-{}-inquiry_id'.format(new_prefix, idx)] = inqry_id
+            formset_data['{}-{}-item_cate'.format(new_prefix, idx)] = inqry.cate.id
+            formset_data['{}-{}-quota_time'.format(new_prefix, idx)] = data['quota_time']
+            formset_data['{}-{}-user_id'.format(new_prefix, idx)] = request.user.id
+        formset = QuotaFormSet(formset_data, prefix=old_prefix)
+        newformset = NewQuotaFormSet(formset_data, prefix=new_prefix)
+    context = {
+        'inqry': inqry,
+        'data': data,
+        'quotaformset': formset,
+        'newquotaformset': newformset,
+    }
+    print(data)
+    return HttpResponse(template.render(context, request))
+
+
+def quota_del(request, quota_id):
+    quota = ItemQuota.objects.get(id=quota_id)
+
+    print(request)
+    quota.delete()
+    return redirect('Inquiry_Detail', quota.inquirysn.id)
