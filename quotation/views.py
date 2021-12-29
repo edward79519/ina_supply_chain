@@ -1,6 +1,6 @@
 import os
 
-from django.forms import formset_factory, modelformset_factory
+from django.forms import formset_factory, modelformset_factory, model_to_dict
 from django.shortcuts import redirect, render
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from supplyChain.settings import BASE_DIR
 from .models import Company, Item, Inquiry, ItemQuota, Current, Category, Manufacturer
 from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm, AddInquiryForm, UpdateQuotaForm, \
-    XlsUploadForm, Quotaform, NewQuotaForm
+    XlsUploadForm, Quotaform, NewQuotaForm, AddCateModelForm, AddMfgModelForm
 from django.utils import timezone
 from datetime import datetime
 from .custom.exchange import getrate
@@ -79,9 +79,15 @@ def comp_update(request, comp_id):
 
 
 def item_list(request):
-    items = Item.objects.all()
+    cates_list = Category.objects.all().values('id', 'name')
+    cate_id = request.GET.get('cate_id')
+    if cate_id:
+        items = Item.objects.filter(cate_id=cate_id)
+    else:
+        items = Item.objects.all()
     template = loader.get_template("quotation/item/list.html")
     context = {
+        'cates_list': cates_list,
         'items': items,
     }
     return HttpResponse(template.render(context, request))
@@ -448,7 +454,36 @@ def inqry_imprtres(request, inqry_id):
 
 def quota_del(request, quota_id):
     quota = ItemQuota.objects.get(id=quota_id)
-
-    print(request)
     quota.delete()
     return redirect('Inquiry_Detail', quota.inquirysn.id)
+
+
+def cate_list(request):
+    template = loader.get_template("quotation/item/category/list.html")
+    cates = Category.objects.all()
+    if request.method == 'POST':
+        form = AddCateModelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('Cate_Lsit')
+    else:
+        form = AddCateModelForm()
+    context = {"cates": cates, "form":form}
+    return HttpResponse(template.render(context, request))
+
+
+def mfg_list(request):
+    template = loader.get_template("quotation/item/manufacturer/list.html")
+    mfgs = Manufacturer.objects.all().order_by('cate__sn', 'sn')
+    if request.method == "POST":
+        form = AddMfgModelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('MFG_Lsit')
+    else:
+        form = AddMfgModelForm()
+    context = {
+        'mfgs': mfgs,
+        'form': form,
+    }
+    return HttpResponse(template.render(context, request))

@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Company, Item, Inquiry, ItemQuota, Current, Manufacturer
+from .models import Company, Item, Inquiry, ItemQuota, Current, Manufacturer, Category
 from django.utils import timezone
 from .validator import FileValidator, ItemSnValidator
 from django.utils.translation import gettext_lazy as _
@@ -267,7 +267,8 @@ class NewQuotaForm(Quotaform):
         item_spec = self.cleaned_data.get('item_spec')
         mfgnametocode = list(Manufacturer.objects.filter(name__exact=item_mfg).values_list('sn', flat=True))
         mfgcodetoname = list(Manufacturer.objects.filter(sn__exact=item_mfgcode).values_list('name', flat=True))
-        speclist = list(Item.objects.filter(cate__id=item_cate, mfg__sn=item_mfgcode).values_list('specmain', flat=True))
+        speclist = list(
+            Item.objects.filter(cate__id=item_cate, mfg__sn=item_mfgcode).values_list('specmain', flat=True))
 
         if (item_mfg not in mfgcodetoname) or (item_mfgcode not in mfgnametocode):
             raise ValidationError(_('製造商名稱與編號不同。'), code='MfgDataMismatch')
@@ -317,3 +318,32 @@ class NewQuotaForm(Quotaform):
         print(mfg, mfg_created)
         print(item, item_created)
         print(quota, quota_created)
+
+
+class AddCateModelForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['sn', 'name']
+        widgets = {
+            'sn': forms.TextInput(attrs={
+                'class': 'form-control',
+                'required': True,
+                'pattern': '^[0-9A-Z]{2}',
+            }),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
+        }
+
+
+class AddMfgModelForm(forms.ModelForm):
+    class Meta:
+        model = Manufacturer
+        fields = ['cate', 'sn', 'name', 'fullname']
+        widgets = {
+            'sn': forms.TextInput(attrs={
+                'class': 'form-control',
+                'pattern': '^[0-9A-Z]{2}',
+            }),
+            'cate': forms.Select(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'fullname': forms.TextInput(attrs={'class': 'form-control'}),
+        }

@@ -1,0 +1,133 @@
+{% extends 'frame/base.html' %}
+
+{% block title %}製造商一覽 - 寶晶供應鏈管理系統{% endblock %}
+{% block css %}
+  <link href="/static/custom/page.css" rel="stylesheet">
+{% endblock %}
+{% block scripts %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <script>
+      var options = {
+        valueNames: [ 'cnt', 'catename', 'sn'],
+        page: 10,
+        pagination: [{
+            name: "pagination",
+            paginationClass: "pagination",
+            innerWindow: 1,
+            outerWindow: 1,
+        }],
+      };
+
+      /*table = id of the div */
+      var userList = new List('table', options);
+    </script>
+{% endblock %}
+{% block content %}
+  <section id="doclist" class="py-3">
+    <div class="container py-3">
+      <h1 class="my-3">製造商一覽</h1>
+      <a class="btn btn-secondary" href="{% url 'Item_Lsit' %}">返回品項列表</a>
+      <div class="row">
+        <div class="col-12 my-3">
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+            新增
+          </button>
+
+          <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">新增製造商</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form method="POST" class="needs-validation" onsubmit="" novalidate>
+                  <div class="modal-body">
+                    <div class="form-row">
+                      {% csrf_token %}
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label for="id_{{ form.sn.name }}">*編號：</label>
+                          {{ form.sn }}
+                          <div class="invalid-feedback">
+                            請輸入編號。
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label for="id_{{ form.cate.name }}">*類別：</label>
+                          {{ form.cate }}
+                          <div class="invalid-feedback">
+                            請輸入名稱。
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <div class="form-group">
+                          <label for="id_{{ form.name.name }}">*名稱：</label>
+                          {{ form.name }}
+                          <div class="invalid-feedback">
+                            請輸入名稱。
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <div class="form-group">
+                          <label for="id_{{ form.fullname.name }}">完整名稱：</label>
+                          {{ form.fullname }}
+                          <div class="invalid-feedback">
+                            請輸入名稱。
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                  <button type="submit" class="btn btn-primary">送出</button>
+                </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="table-responsive" id="table">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col" class="sort fit" data-sort="cnt"></th>
+                  <th scope="col" class="sort text-center fit" data-sort="cate">類別</th>
+                  <th scope="col" class="sort text-center" data-sort="sn">編號</th>
+                  <th scope="col" class="sort" data-sort="name">名稱</th>
+                  <th scope="col" class="sort" data-sort="name">完整名稱</th>
+                </tr>
+              </thead>
+              <tbody class="list">
+                {% for mfg in mfgs %}
+                <tr>
+                  <td class="cnt fit">{{ forloop.counter }}</td>
+                  <td class="cate text-center">{{ mfg.cate }}</td>
+                  <td class="sn text-center">{{ mfg.sn }}</td>
+                  <td class="name">{{ mfg.name }}</td>
+                  <td class="name">{{ mfg.fullname }}</td>
+                </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="5" class="text-center"> 目前尚無任何品項。 </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <nav aria-label="Page navigation">
+              <ul class="pagination"></ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}
