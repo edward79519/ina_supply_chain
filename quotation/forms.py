@@ -279,6 +279,7 @@ class NewQuotaForm(Quotaform):
     def save(self):
         data = self.cleaned_data
         cate_id = data['item_cate']
+        cate_sn = Category.objects.get(id=cate_id).sn
         mfg_sn = data['item_mfgcode']
         mfg_name = data['item_mfg']
         item_spec = data['item_spec']
@@ -289,7 +290,7 @@ class NewQuotaForm(Quotaform):
         quota_crnt = Current.objects.get(name=data['quota_crnt'])
         quota_time = data['quota_time']
         xchg_rate = getrate(quota_crnt.code, quota_time)['ex_rate']
-        item_sn = "{}{}{}".format(cate_id, mfg_sn, item_spec.zfill(8))
+        item_sn = "{}{}{}".format(cate_sn, mfg_sn, item_spec.zfill(8))
 
         mfg, mfg_created = Manufacturer.objects.get_or_create(
             cate_id=cate_id,
