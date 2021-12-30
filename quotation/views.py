@@ -420,6 +420,7 @@ def inqry_imprtres(request, inqry_id):
                 form.save()
             for form in newformset:
                 form.save()
+            os.remove(filepath)
             return redirect('Inquiry_Detail', inqry_id=inqry_id)
     else:
         formset_data = {
