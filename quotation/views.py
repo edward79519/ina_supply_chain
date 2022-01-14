@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from supplyChain.settings import BASE_DIR
 from .models import Company, Item, Inquiry, ItemQuota, Current, Category, Manufacturer
 from .forms import AddCompForm, UpdateCompForm, AddItemForm, UpdateItemForm, AddInquiryForm, UpdateQuotaForm, \
-    XlsUploadForm, Quotaform, NewQuotaForm, AddCateModelForm, AddMfgModelForm
+    XlsUploadForm, Quotaform, NewQuotaForm, AddCateModelForm, AddMfgModelForm, UpdateCateForm, UpdateMfgForm
 from django.utils import timezone
 from datetime import datetime
 from .custom.exchange import getrate
@@ -152,7 +152,7 @@ def item_hstr_export(request, item_id):
 def get_itemsn(cate_id, mfg_id, spec):
     cate = Category.objects.get(id=cate_id).sn
     mfg = Manufacturer.objects.get(id=mfg_id).sn
-    return '{}{}{}'.format(cate, mfg, spec.zfill(8))
+    return '{}{}{}'.format(cate, mfg, spec.zfill(10))
 
 
 @login_required
@@ -463,13 +463,18 @@ def cate_list(request):
     template = loader.get_template("quotation/item/category/list.html")
     cates = Category.objects.all()
     if request.method == 'POST':
+        updateform = UpdateCateForm(request.POST)
         form = AddCateModelForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('Cate_Lsit')
+        if updateform.is_valid():
+            updateform.save()
+            return redirect('Cate_Lsit')
     else:
+        updateform = UpdateCateForm()
         form = AddCateModelForm()
-    context = {"cates": cates, "form":form}
+    context = {"cates": cates, "form": form, "updateform": updateform}
     return HttpResponse(template.render(context, request))
 
 
@@ -478,13 +483,19 @@ def mfg_list(request):
     mfgs = Manufacturer.objects.all().order_by('cate__sn', 'sn')
     if request.method == "POST":
         form = AddMfgModelForm(request.POST)
+        updateform = UpdateMfgForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('MFG_Lsit')
+        if updateform.is_valid():
+            updateform.save()
+            return redirect('MFG_Lsit')
     else:
+        updateform = UpdateMfgForm()
         form = AddMfgModelForm()
     context = {
         'mfgs': mfgs,
         'form': form,
+        'updateform': updateform,
     }
     return HttpResponse(template.render(context, request))

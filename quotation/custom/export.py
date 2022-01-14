@@ -62,7 +62,7 @@ def to_excel(data):
     rh.height = 35  # value in points, there is no "auto"
 
     # 設定幣別只能用選項
-    crrn_code = ['新台幣', '美元', '歐元', '人民幣', '日圓']
+    crrn_code = ['新台幣', '美金', '歐元', '人民幣', '日圓']
     list_option = '"{}"'.format(','.join(crrn_code))
     data_val = DataValidation(type="list", formula1=list_option)
     ws.add_data_validation(data_val)

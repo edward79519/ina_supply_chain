@@ -1,6 +1,6 @@
 {% extends 'frame/base.html' %}
 
-{% block title %}製造商一覽 - 寶晶供應鏈管理系統{% endblock %}
+{% block title %}廠商一覽 - 寶晶供應鏈管理系統{% endblock %}
 {% block css %}
   <link href="/static/custom/page.css" rel="stylesheet">
 {% endblock %}
@@ -20,24 +20,40 @@
 
       /*table = id of the div */
       var userList = new List('table', options);
+
+      $('#editModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var id = button.data('id')
+        var sn = button.data('sn')
+        var name = button.data('name')
+        var fullname = button.data('fullname')  // Extract info from data-* attributes
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this)
+        modal.find('.modal-title').text('更新廠商(' + sn + ')名稱:')
+        modal.find('.model-body')
+        modal.find('.modal-body input[id="id_mfg_id"]').val(id)
+        modal.find('.modal-body input[id="id_name"]').val(name)
+        modal.find('.modal-body input[id="id_fullname"]').val(fullname)
+      })
     </script>
 {% endblock %}
 {% block content %}
   <section id="doclist" class="py-3">
     <div class="container py-3">
-      <h1 class="my-3">製造商一覽</h1>
+      <h1 class="my-3">廠商一覽</h1>
       <a class="btn btn-secondary" href="{% url 'Item_Lsit' %}">返回品項列表</a>
       <div class="row">
         <div class="col-12 my-3">
           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">
             新增
           </button>
-
+          <!--彈出新增視窗-->
           <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">新增製造商</h5>
+                  <h5 class="modal-title" id="exampleModalLabel">新增廠商</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -92,8 +108,41 @@
               </div>
             </div>
           </div>
+
+          <!--彈出更新視窗-->
+          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editModalLabel">編輯廠商名稱</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form method="POST" onsubmit="">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                      {{ updateform.mfg_id }}
+                      <div class="form-group">
+                        <label for="id_name" class="col-form-label">名稱:</label>
+                        {{ updateform.name }}
+                      </div>
+                      <div class="form-group">
+                        <label for="id_fullname" class="col-form-label">完整名稱:</label>
+                        {{ updateform.fullname }}
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <div class="col-6">
+        <div class="col-10">
           <div class="table-responsive" id="table">
             <table class="table table-hover">
               <thead>
@@ -103,6 +152,7 @@
                   <th scope="col" class="sort text-center" data-sort="sn">編號</th>
                   <th scope="col" class="sort" data-sort="name">名稱</th>
                   <th scope="col" class="sort" data-sort="name">完整名稱</th>
+                  <th scope="col">動作</th>
                 </tr>
               </thead>
               <tbody class="list">
@@ -113,10 +163,21 @@
                   <td class="sn text-center">{{ mfg.sn }}</td>
                   <td class="name">{{ mfg.name }}</td>
                   <td class="name">{{ mfg.fullname }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary"
+                      data-toggle="modal"
+                      data-target="#editModal"
+                      data-id="{{ mfg.id }}"
+                      data-sn="{{ mfg.sn }}"
+                      data-name="{{ mfg.name }}"
+                      data-fullname="{{ mfg.fullname }}">編輯</button>
+                  </td>
                 </tr>
                 {% empty %}
                   <tr>
-                    <td colspan="5" class="text-center"> 目前尚無任何品項。 </td>
+                    <td colspan="6" class="text-center"> 目前尚無任何品項。 </td>
                   </tr>
                 {% endfor %}
               </tbody>

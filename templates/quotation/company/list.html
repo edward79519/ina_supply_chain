@@ -8,7 +8,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script>
       var options = {
-        valueNames: [ 'fullname', 'sn' ],
+        valueNames: [ 'fullname', 'sn', 'spnsr', 'tel', 'email'],
         page: 10,
         pagination: [{
             name: "pagination",
@@ -19,7 +19,7 @@
       };
 
       /*table = id of the div */
-      var userList = new List('table', options);
+      var userList = new List('comp-list', options);
     </script>
 {% endblock %}
 {% block content %}
@@ -32,21 +32,21 @@
           <a role="button" class="btn btn-primary" href="{% url 'Comp_Add' %}">新增</a>
         </div>
         <div class="col-12">
-          <div class="table-responsive" id="table">
+          <div class="table-responsive" id="comp-list">
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">搜尋...</span>
               </div>
-              <input type="text" class="fuzzy-search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
+              <input type="text" class="search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
             </div>
             <table class="table table-hover">
               <thead>
                 <tr>
                   <th scope="col" class="sort" data-sort="fullname">公司名稱</th>
                   <th scope="col" class="sort fit" data-sort="sn">統編</th>
-                  <th scope="col" class="text-center">聯絡人</th>
-                  <th scope="col" class="text-center">連絡電話</th>
-                  <th scope="col" class="text-center">E-mail</th>
+                  <th scope="col" class="sort text-center" data-sort="spnsr">聯絡人</th>
+                  <th scope="col" class="sort text-center" data-sort="tel">連絡電話</th>
+                  <th scope="col" class="sort text-center" data-sort="email">E-mail</th>
                 </tr>
               </thead>
               <tbody class="list">
@@ -54,16 +54,16 @@
                 <tr>
                   <td class="fullname"><a href="{% url 'Comp_Detail' comp.id %}">{{ comp.fullname }}</a></td>
                   <td class="sn">{{ comp.sn }}</td>
-                  <td class="text-center">{{ comp.spnsr }}</td>
-                  <td class="text-center">
+                  <td class="spnsr text-center">{{ comp.spnsr }}</td>
+                  <td class="tel text-center">
                     {{ comp.tel }}
                     {% if comp.tel_ext %} ext:{{ comp.tel_ext }}{% endif %}
                   </td>
-                  <td class="text-center">{{ comp.email }}</td>
+                  <td class="email text-center">{{ comp.email }}</td>
                 </tr>
                 {% empty %}
                   <tr>
-                    <td colspan="6"> Empty </td>
+                    <td colspan="6"> 目前尚無任何資料。 </td>
                   </tr>
                 {% endfor %}
               </tbody>

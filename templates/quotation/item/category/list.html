@@ -20,18 +20,33 @@
 
       /*table = id of the div */
       var userList = new List('table', options);
+
+      $('#editModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var id = button.data('id')
+        var sn = button.data('sn')
+        var name = button.data('name')// Extract info from data-* attributes
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this)
+        modal.find('.modal-title').text('更新類別(' + sn + ')名稱:')
+        modal.find('.model-body')
+        modal.find('.modal-body input[id="id_cate_id"]').val(id)
+        modal.find('.modal-body input[id="id_name"]').val(name)
+      })
     </script>
 {% endblock %}
 {% block content %}
   <section id="doclist" class="py-3">
     <div class="container py-3">
       <h1 class="my-3">類別一覽</h1>
-      <a class="btn btn-secondary" href="{% url 'Item_Lsit' %}">返回品項列表</a>
+      <a class="btn btn-secondary" href="{% url 'Item_Lsit' %}">返回品項一覽</a>
       <div class="row">
         <div class="col-12 my-3">
           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">
             新增
           </button>
+          <!--彈出新增視窗-->
           <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -74,26 +89,66 @@
             </div>
           </div>
         </div>
+
+        <!--彈出更新視窗-->
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">編輯類別名稱</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form method="POST" onsubmit="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ updateform.cate_id }}
+                    <div class="form-group">
+                      <label for="id_name" class="col-form-label">名稱:</label>
+                      {{ updateform.name }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                  <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
         <div class="col-6">
           <div class="table-responsive" id="table">
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col" class="sort fit" data-sort="cnt"></th>
-                  <th scope="col" class="sort text-center" data-sort="sn">類別編號</th>
+                  <th scope="col" class="sort fit" data-sort="cnt">項次</th>
+                  <th scope="col" class="sort text-center fit" data-sort="sn">類別編號</th>
                   <th scope="col" class="sort" data-sort="catename">類別名稱</th>
+                  <th scope="col">動作</th>
                 </tr>
               </thead>
               <tbody class="list">
                 {% for cate in cates %}
                 <tr>
-                  <td class="cnt fit">{{ forloop.counter }}</td>
+                  <td class="cnt">{{ forloop.counter }}</td>
                   <td class="sn text-center">{{ cate.sn }}</td>
                   <td class="catename">{{ cate.name }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary"
+                      data-toggle="modal"
+                      data-target="#editModal"
+                      data-id="{{ cate.id }}"
+                      data-sn="{{ cate.sn }}"
+                      data-name="{{ cate.name }}">編輯</button>
+                  </td>
                 </tr>
                 {% empty %}
                   <tr>
-                    <td colspan="3" class="text-center"> 目前尚無任何品項。 </td>
+                    <td colspan="4" class="text-center"> 目前尚無任何品項。 </td>
                   </tr>
                 {% endfor %}
               </tbody>

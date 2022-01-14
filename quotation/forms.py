@@ -24,11 +24,10 @@ class AddCompForm(forms.ModelForm):
             'spnsr_shrtname': forms.TextInput(attrs={'class': 'form-control'}),
             'tel': forms.TextInput(attrs={
                 'class': 'form-control',
-                'pattern': '[0-9]{2,4}(-[0-9]{3,4}){2}',
                 'placeholder': 'ex: 0912-123-456 or 02-1234-5678',
             }),
             'tel_ext': forms.TextInput(attrs={'class': 'form-control', 'pattern': '[0-9]*'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@abc.com'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@abc.com', 'required': True}),
             'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'author': forms.HiddenInput(),
         }
@@ -70,7 +69,7 @@ class AddItemForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'cate': forms.Select(attrs={'class': 'form-control'}),
             'mfg': forms.Select(attrs={'class': 'form-control'}),
-            'specmain': forms.TextInput(attrs={'class': 'form-control', 'pattern': '^[0-9A-Z]{5,8}'}),
+            'specmain': forms.TextInput(attrs={'class': 'form-control', 'pattern': '^[0-9A-Z]{5,10}'}),
             'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
 
@@ -242,7 +241,7 @@ class NewQuotaForm(Quotaform):
         widget=forms.TextInput(attrs={
             'required': True,
             'class': 'form-control',
-            'pattern': '^[0-9A-Z]{5,8}'
+            'pattern': '^[0-9A-Z]{5,10}'
         })
     )
     item_mfgcode = forms.CharField(
@@ -290,7 +289,7 @@ class NewQuotaForm(Quotaform):
         quota_crnt = Current.objects.get(name=data['quota_crnt'])
         quota_time = data['quota_time']
         xchg_rate = getrate(quota_crnt.code, quota_time)['ex_rate']
-        item_sn = "{}{}{}".format(cate_sn, mfg_sn, item_spec.zfill(8))
+        item_sn = "{}{}{}".format(cate_sn, mfg_sn, item_spec.zfill(10))
 
         mfg, mfg_created = Manufacturer.objects.get_or_create(
             cate_id=cate_id,
@@ -335,6 +334,29 @@ class AddCateModelForm(forms.ModelForm):
         }
 
 
+class UpdateCateForm(forms.Form):
+    cate_id = forms.IntegerField(
+        required=True,
+        widget=forms.HiddenInput(),
+    )
+    name = forms.CharField(
+        required=True,
+        max_length=20,
+        label=_("名稱"),
+        widget=forms.TextInput(attrs={
+            'required': True,
+            'class': 'form-control',
+        })
+    )
+
+    def save(self):
+        data = self.cleaned_data
+        cate_id = data['cate_id']
+        cate = Category.objects.get(id=cate_id)
+        cate.name = data['name']
+        cate.save()
+
+
 class AddMfgModelForm(forms.ModelForm):
     class Meta:
         model = Manufacturer
@@ -348,3 +370,34 @@ class AddMfgModelForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'fullname': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+
+class UpdateMfgForm(forms.Form):
+    mfg_id = forms.IntegerField(
+        required=True,
+        widget=forms.HiddenInput(),
+    )
+    name = forms.CharField(
+        required=True,
+        max_length=20,
+        label=_("名稱"),
+        widget=forms.TextInput(attrs={
+            'required': True,
+            'class': 'form-control',
+        })
+    )
+    fullname = forms.CharField(
+        max_length=20,
+        label=_("名稱"),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        })
+    )
+
+    def save(self):
+        data = self.cleaned_data
+        mfg_id = data['mfg_id']
+        mfg = Manufacturer.objects.get(id=mfg_id)
+        mfg.name = data['name']
+        mfg.fullname = data['fullname']
+        mfg.save()

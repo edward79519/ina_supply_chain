@@ -39,6 +39,9 @@ class Category(models.Model):
     sn = models.CharField(max_length=2, unique=True)
     name = models.CharField(max_length=20)
     history = HistoricalRecords()
+    addtime = models.DateTimeField(auto_now_add=True)
+    updatetime = models.DateTimeField(auto_now=True)
+    is_open = models.BooleanField(default=True)
 
     def __str__(self):
         return "{}_{}".format(self.sn, self.name)
@@ -53,6 +56,9 @@ class Manufacturer(ModelBase):
         on_delete=models.PROTECT,
         related_name='manufacturer',
     )
+    addtime = models.DateTimeField(auto_now_add=True)
+    updatetime = models.DateTimeField(auto_now=True)
+    is_open = models.BooleanField(default=True)
 
     def __str__(self):
         return "{}_{}".format(self.sn, self.name)
