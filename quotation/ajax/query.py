@@ -7,7 +7,7 @@ def get_mfg(request):
     cate_id = request.GET.get('cate_id')
     pattern = r'\d+'
     if re.match(pattern, cate_id) is not None:
-        mfgs = Manufacturer.objects.filter(cate_id=cate_id)
+        mfgs = Manufacturer.objects.filter(cate_id=cate_id, is_open=True)
     else:
         mfgs = Manufacturer.objects.all()
     mfg_list = []

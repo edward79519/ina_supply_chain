@@ -75,7 +75,7 @@
                   </div>
                   <div class="col-6 col-md-3">
                     <div class="form-group">
-                      <label for="id_{{ form.spnsr_shrtname.name }}">別名：</label>
+                      <label for="id_{{ form.spnsr_shrtname.name }}">職稱：</label>
                       {{ form.spnsr_shrtname }}
                       <div class="invalid-feedback">
                         {{ form.spnsr_shrtname.errors }}
@@ -116,12 +116,6 @@
                       <div class="invalid-feedback">
                         {{ form.remark.errors }}
                       </div>
-                    </div>
-                  </div>
-                  <div class="col-12 mb-3">
-                    <div class="custom-control custom-switch">
-                      {{ form.is_open }}
-                      <label class="custom-control-label" for="id_{{ form.is_open.name }}">是否檢索？</label>
                     </div>
                   </div>
                 </div>

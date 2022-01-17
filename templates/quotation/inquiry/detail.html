@@ -24,15 +24,84 @@
       <h1 class="my-3">詢價單：{{ inquiry.sn }} - 詳細資料</h1>
       <div class="text-right">新增日期：{{ inquiry.addtime|date:"Y-m-d h:i:s a" }} by {{ inquiry.author }}</div>
       <div class="text-right">上次修改日期：{{ inquiry.history.latest.history_date|date:"Y-m-d h:i:s a" }} by {{ inquiry.history.latest.history_user }}</div>
+
+      <!-- 按鈕區塊 -->
       <a role="button" class="btn btn-primary" href="{% url 'Inquiry_List' %}">回詢價單列表</a>
-      <a role="button" class="btn btn-secondary" href="{% url 'Inquiry_Eptxls' inquiry.id %}">匯出詢價單</a>
       {% if inquiry.status == "詢價中" %}
+        <a role="button" class="btn btn-secondary" href="{% url 'Inquiry_Eptxls' inquiry.id %}">匯出詢價單</a>
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#xlsImport">
           匯入詢價單
         </button>
-        <a role="button" class="btn btn-danger" href="{% url 'Inquiry_Close' inquiry.id %}">結案</a>
+        <!-- 觸發結案彈出視窗 -->
+        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#closeModal">
+          結案
+        </button>
+        <!-- 觸發刪除彈出視窗 -->
+        {% if inquiry.itemquota.count == 0 %}
+          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delModal">
+            永久刪除
+          </button>
+        {% endif %}
+
+        <!-- 結案彈出視窗 -->
+          <div class="modal fade" id="closeModal" tabindex="-1" role="dialog" aria-labelledby="closeModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="closeModalLabel">確定結案？</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>是否確定要結案 "{{ inquiry }}" ？</p>
+                  <p>結案之後將無法新增修改報價內容。</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                  <a href="{% url 'Inquiry_Close' inquiry.id %}"><button type="button" class="btn btn-warning">確定結案</button></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        <!-- 刪除彈出視窗 -->
+          <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="delModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="delModalLabel">確定刪除？</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>是否確定要刪除 "{{ inquiry }}" ？</p>
+                  <p>刪除之後將不可復原資料，請注意。</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                  <a href="{% url 'Inquiry_Del' inquiry.id %}"><button type="button" class="btn btn-danger">確定刪除</button></a>
+                </div>
+              </div>
+            </div>
+          </div>
       {% endif %}
+
+      <!-- 資料區塊 -->
       <div class="row">
+        <!-- 錯誤訊息區 -->
+        <div class="col-12 my-1">
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <!--詳細資料區 -->
         <div class="col-md-3 my-3">
           <h6>單號：</h6>
           <h5 class="font-weight-bold">{{ inquiry.sn }}</h5>
@@ -225,11 +294,6 @@
               </div>
 
             </div>
-{#            <div class="mb-3">#}
-{#              <label for="id_{{ form.source_code_file.name }}" class="form-label"></label>#}
-{#              {{ form.source_code_file }}#}
-{#            </div>#}
-{#            {{ form }}#}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>

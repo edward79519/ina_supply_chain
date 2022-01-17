@@ -33,6 +33,28 @@
         modal.find('.model-body')
         modal.find('.modal-body input[id="id_cate_id"]').val(id)
         modal.find('.modal-body input[id="id_name"]').val(name)
+      });
+
+      $('.delModal').on('click', function () {
+          let cate_id = $(this).data('id');
+          let cate_name = $(this).parent().parent().find('.catename').text()
+          var del = window.confirm('確定是否要刪除 "' + cate_name +'" ?\r\n(不會出現在列表中，也不能再選擇。)');
+          if (del===true){
+              window.location.href="/quotation/item/cate/" + cate_id+ "/delete/";
+          }else{
+              window.location.href="./";
+          }
+      })
+
+      $('.delFvrModal').on('click', function () {
+          let cate_id = $(this).data('id');
+          let cate_name = $(this).parent().parent().find('.catename').text()
+          var del = window.confirm('確定是否要永久刪除 "' + cate_name +'" ?\r\n(從資料庫刪除，且不能再復原。)');
+          if (del===true){
+              window.location.href="/quotation/item/cate/" + cate_id+ "/prmntdel/";
+          }else{
+              window.location.href="./";
+          }
       })
     </script>
 {% endblock %}
@@ -118,7 +140,7 @@
           </div>
         </div>
 
-        <div class="col-6">
+        <div class="col-lg-10">
           <div class="table-responsive" id="table">
             <table class="table table-hover">
               <thead>
@@ -144,6 +166,16 @@
                       data-id="{{ cate.id }}"
                       data-sn="{{ cate.sn }}"
                       data-name="{{ cate.name }}">編輯</button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger delModal"
+                      data-id="{{ cate.id }}">刪除</button>
+                    {% if cate.items.count == 0 %}
+                      <button
+                      type="button"
+                      class="btn btn-sm btn-danger delFvrModal"
+                      data-id="{{ cate.id }}">永久刪除</button>
+                    {% endif %}
                   </td>
                 </tr>
                 {% empty %}

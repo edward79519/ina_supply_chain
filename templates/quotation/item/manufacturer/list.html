@@ -8,7 +8,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
     <script>
       var options = {
-        valueNames: [ 'cnt', 'catename', 'sn'],
+        valueNames: [ 'cnt', 'cate', 'sn', 'name', 'fullname'],
         page: 10,
         pagination: [{
             name: "pagination",
@@ -35,6 +35,28 @@
         modal.find('.modal-body input[id="id_mfg_id"]').val(id)
         modal.find('.modal-body input[id="id_name"]').val(name)
         modal.find('.modal-body input[id="id_fullname"]').val(fullname)
+      });
+
+      $('.delModal').on('click', function () {
+          let mfg_id = $(this).data('id');
+          let mfg_name = $(this).parent().parent().find('.name').text()
+          var del = window.confirm('確定是否要刪除 "' + mfg_name +'" ?');
+          if (del===true){
+              window.location.href="/quotation/item/mfg/" + mfg_id+ "/delete/";
+          }else{
+              window.location.href="./";
+          }
+      });
+
+      $('.delFvrModal').on('click', function () {
+          let mfg_id = $(this).data('id');
+          let mfg_name = $(this).parent().parent().find('.catename').text()
+          var del = window.confirm('確定是否要永久刪除 "' + mfg_name +'" ?\r\n(從資料庫刪除，且不能再復原。)');
+          if (del===true){
+              window.location.href="/quotation/item/mfg/" + mfg_id+ "/prmntdel/";
+          }else{
+              window.location.href="./";
+          }
       })
     </script>
 {% endblock %}
@@ -67,7 +89,7 @@
                           <label for="id_{{ form.sn.name }}">*編號：</label>
                           {{ form.sn }}
                           <div class="invalid-feedback">
-                            請輸入編號。
+                            請輸入兩碼英文編號。
                           </div>
                         </div>
                       </div>
@@ -76,7 +98,7 @@
                           <label for="id_{{ form.cate.name }}">*類別：</label>
                           {{ form.cate }}
                           <div class="invalid-feedback">
-                            請輸入名稱。
+                            請選擇類別。
                           </div>
                         </div>
                       </div>
@@ -142,7 +164,7 @@
           </div>
 
         </div>
-        <div class="col-10">
+        <div class="col-lg-10">
           <div class="table-responsive" id="table">
             <table class="table table-hover">
               <thead>
@@ -151,7 +173,7 @@
                   <th scope="col" class="sort text-center fit" data-sort="cate">類別</th>
                   <th scope="col" class="sort text-center" data-sort="sn">編號</th>
                   <th scope="col" class="sort" data-sort="name">名稱</th>
-                  <th scope="col" class="sort" data-sort="name">完整名稱</th>
+                  <th scope="col" class="sort" data-sort="fullname">完整名稱</th>
                   <th scope="col">動作</th>
                 </tr>
               </thead>
@@ -162,7 +184,7 @@
                   <td class="cate text-center">{{ mfg.cate }}</td>
                   <td class="sn text-center">{{ mfg.sn }}</td>
                   <td class="name">{{ mfg.name }}</td>
-                  <td class="name">{{ mfg.fullname }}</td>
+                  <td class="fullname">{{ mfg.fullname }}</td>
                   <td>
                     <button
                       type="button"
@@ -173,6 +195,16 @@
                       data-sn="{{ mfg.sn }}"
                       data-name="{{ mfg.name }}"
                       data-fullname="{{ mfg.fullname }}">編輯</button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger delModal"
+                      data-id="{{ mfg.id }}">刪除</button>
+                    {% if mfg.items.count == 0 %}
+                      <button
+                      type="button"
+                      class="btn btn-sm btn-danger delFvrModal"
+                      data-id="{{ mfg.id }}">永久刪除</button>
+                    {% endif %}
                   </td>
                 </tr>
                 {% empty %}

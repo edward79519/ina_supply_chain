@@ -55,6 +55,7 @@ class Manufacturer(ModelBase):
         Category,
         on_delete=models.PROTECT,
         related_name='manufacturer',
+        limit_choices_to={'is_open': True},
     )
     addtime = models.DateTimeField(auto_now_add=True)
     updatetime = models.DateTimeField(auto_now=True)
@@ -71,11 +72,13 @@ class Item(ModelBase):
         Category,
         on_delete=models.PROTECT,
         related_name='items',
+        limit_choices_to={'is_open': True},
     )
     mfg = models.ForeignKey(
         Manufacturer,
         on_delete=models.PROTECT,
-        related_name='items'
+        related_name='items',
+        limit_choices_to={'is_open': True},
     )
     specmain = models.CharField(max_length=100)
     remark = models.CharField(max_length=250, blank=True, null=True)
@@ -118,11 +121,13 @@ class Inquiry(ModelBase):
         Category,
         on_delete=models.PROTECT,
         related_name='inquirys',
+        limit_choices_to={'is_open': True},
     )
     company = models.ForeignKey(
         Company,
         on_delete=models.PROTECT,
         related_name='inquirys',
+        limit_choices_to={'is_open': True},
     )
     status = models.CharField(
         max_length=10,

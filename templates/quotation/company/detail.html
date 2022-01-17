@@ -42,6 +42,64 @@
       <div class="text-right">上次修改日期：{{ comp.history.latest.history_date|date:"Y-m-d h:i:s a" }} by {{ comp.history.latest.history_user }}</div>
       <a role="button" class="btn btn-primary" href="{% url 'Comp_Index' %}">回廠商列表</a>
       <a role="button" class="btn btn-danger" href="{% url 'Comp_Update' comp.id %}">編輯</a>
+
+      <!-- 觸發刪除視窗 -->
+      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#tmpDelModal">
+        刪除
+      </button>
+      {% if comp.inquirys.count == 0 %}
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#permDelModal">
+          永久刪除
+        </button>
+      {% endif %}
+
+      <!-- 彈出刪除視窗 -->
+      <div class="modal fade" id="tmpDelModal" tabindex="-1" role="dialog" aria-labelledby="tmpDelModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="tmpDelModalLabel">確認刪除？</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>是否刪除 {{ comp }} 資料?</p>
+              <p>(此刪除資料將不會在列表中出現，也不可再選擇，如需要復原請洽管理員。)</p>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+              <a href="{% url 'Comp_TmpDel' comp.id %}"><button type="button" class="btn btn-danger">確定刪除</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 彈出永久刪除視窗 -->
+      <div class="modal fade" id="permDelModal" tabindex="-1" role="dialog" aria-labelledby="permDelModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="permDelModalLabel">確認永久刪除？</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>是否永久刪除 {{ comp }} 資料?</p>
+              <p>(此刪除將無法復原，將從資料庫永久刪除，只有在沒有關聯任何資料時才會刪除。)</p>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+              <a href="{% url 'Comp_PermDel' comp.id%}"><button type="button" class="btn btn-danger">確定永久刪除</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 公司詳細資料 -->
       <div class="row">
         <div class="col-md-6 my-3">
           <h6>公司名稱：</h6>
@@ -86,7 +144,7 @@
               <div class="col-6">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">搜尋...</span>
+                    <span class="input-group-text" id="basic-addon1">全欄位搜尋</span>
                   </div>
                   <input type="text" class="search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
                 </div>
@@ -144,7 +202,7 @@
               <div class="col-6">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">搜尋...</span>
+                    <span class="input-group-text" id="basic-addon1">全欄位搜尋</span>
                   </div>
                   <input type="text" class="search form-control" placeholder="輸入關鍵字" aria-label="Username" aria-describedby="basic-addon1">
                 </div>

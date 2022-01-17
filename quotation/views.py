@@ -4,6 +4,7 @@ from django.forms import formset_factory, modelformset_factory, model_to_dict
 from django.shortcuts import redirect, render
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.contrib import messages
 
 from supplyChain.settings import BASE_DIR
 from .models import Company, Item, Inquiry, ItemQuota, Current, Category, Manufacturer
@@ -19,7 +20,7 @@ from .custom import export
 
 
 def comp_list(request):
-    comp_list = Company.objects.all()
+    comp_list = Company.objects.filter(is_open=True)
     template = loader.get_template('quotation/company/list.html')
     context = {
         'comp_list': comp_list,
@@ -76,6 +77,22 @@ def comp_update(request, comp_id):
         'form': form,
     }
     return HttpResponse(template.render(context, request))
+
+
+@login_required
+def comp_tmpdel(request, comp_id):
+    comp = Company.objects.get(id=comp_id)
+    comp.is_open = False
+    comp.save()
+    return redirect('Comp_Index')
+
+
+@login_required
+def comp_permdel(request, comp_id):
+    comp = Company.objects.get(id=comp_id)
+    if comp.inquirys.count() == 0:
+        comp.delete()
+    return redirect('Comp_Index')
 
 
 def item_list(request):
@@ -201,6 +218,14 @@ def item_update(request, item_id):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
+def item_permdel(request, item_id):
+    item = Item.objects.get(id=item_id)
+    if item.itemquota.count() == 0:
+        item.delete()
+    return redirect('Item_Lsit')
+
+
 def inquiry_list(request):
     inquirys = Inquiry.objects.all().order_by("-addtime")
     template = loader.get_template("quotation/inquiry/list.html")
@@ -271,9 +296,21 @@ def inquiry_add(request):
 @login_required
 def inquiry_close(request, inqry_id):
     inqry = Inquiry.objects.get(id=inqry_id)
-    inqry.status = Inquiry.Status.END
-    inqry.save()
+    no_price = inqry.itemquota.filter(price__isnull=True)
+    if no_price.count() == 0:
+        inqry.status = Inquiry.Status.END
+        inqry.save()
+    else:
+        messages.error(request, "還有沒報價的品項，請刪除或新增報價。")
     return HttpResponseRedirect("../")
+
+
+@login_required
+def inquiry_del(request, inqry_id):
+    inqry = Inquiry.objects.get(id=inqry_id)
+    if inqry.itemquota.count() == 0:
+        inqry.delete()
+    return redirect("Inquiry_List")
 
 
 @login_required
@@ -461,7 +498,7 @@ def quota_del(request, quota_id):
 
 def cate_list(request):
     template = loader.get_template("quotation/item/category/list.html")
-    cates = Category.objects.all()
+    cates = Category.objects.filter(is_open=True)
     if request.method == 'POST':
         updateform = UpdateCateForm(request.POST)
         form = AddCateModelForm(request.POST)
@@ -478,9 +515,25 @@ def cate_list(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
+def cate_del(request, cate_id):
+    cate = Category.objects.get(id=cate_id)
+    cate.is_open = False
+    cate.save()
+    return redirect('Cate_Lsit')
+
+
+@login_required
+def cate_prmntdel(request, cate_id):
+    cate = Category.objects.get(id=cate_id)
+    if cate.items.count() == 0:
+        cate.delete()
+    return redirect('Cate_Lsit')
+
+
 def mfg_list(request):
     template = loader.get_template("quotation/item/manufacturer/list.html")
-    mfgs = Manufacturer.objects.all().order_by('cate__sn', 'sn')
+    mfgs = Manufacturer.objects.filter(is_open=True).order_by('cate__sn', 'sn')
     if request.method == "POST":
         form = AddMfgModelForm(request.POST)
         updateform = UpdateMfgForm(request.POST)
@@ -499,3 +552,19 @@ def mfg_list(request):
         'updateform': updateform,
     }
     return HttpResponse(template.render(context, request))
+
+
+@login_required
+def mfg_del(request, mfg_id):
+    mfg = Manufacturer.objects.get(id=mfg_id)
+    mfg.is_open = False
+    mfg.save()
+    return redirect('MFG_Lsit')
+
+
+@login_required
+def mfg_prmntdel(request, mfg_id):
+    mfg = Manufacturer.objects.get(id=mfg_id)
+    if mfg.items.count() == 0:
+        mfg.delete()
+    return redirect('MFG_Lsit')
