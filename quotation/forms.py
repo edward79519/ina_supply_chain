@@ -93,8 +93,8 @@ class AddInquiryForm(forms.ModelForm):
         widgets = {
             'cate': forms.Select(attrs={'class': 'form-control'}),
             'company': forms.Select(attrs={'class': 'form-control'}),
-            'startdate': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'enddate': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'startdate': forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'max': '9999-12-31'}),
+            'enddate': forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'max': '9999-12-31'}),
             'author': forms.Select(attrs={'class': 'form-control', 'disabled': True}),
             'remark': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
